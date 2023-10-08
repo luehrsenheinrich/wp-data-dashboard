@@ -11,6 +11,8 @@ use App\Entity\ThemeSnapshot;
 use App\Options\ThemeCrawlerStateOption;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WpOrgApiCrawlService
@@ -49,7 +51,11 @@ class WpOrgApiCrawlService
 		private HttpClientInterface $client,
 		private ManagerRegistry $doctrine,
 		private OptionsService $optionsService,
+		private LoggerInterface $logger,
+		private ContainerBagInterface $params,
 	) {
+		$this->dateTimeOffset = $this->params->get('app.wp_crawl_time_offset');
+		$this->perPage = intval($this->params->get('app.wp_crawl_per_page'));
 	}
 
 	/**
@@ -94,6 +100,10 @@ class WpOrgApiCrawlService
 			'request[fields][active_installs]' => true,
 		];
 
+		$this->logger->info('Requesting themes from WordPress.org API.', [
+			'params' => $params,
+		]);
+
 		return $this->request($this->themeEndpoint, $params);
 	}
 
@@ -102,9 +112,9 @@ class WpOrgApiCrawlService
 	 * This method does not have properties, as it handles the crawl state
 	 * with an option from the database.
 	 *
-	 * @return void
+	 * @return array The themes object from the API.
 	 */
-	public function crawlThemes(): void
+	public function crawlThemes(): ?array
 	{
 		/**
 		 * @var ThemeCrawlerStateOption $crawlState
@@ -124,9 +134,12 @@ class WpOrgApiCrawlService
 		 * start a new crawl.
 		 */
 		if ($crawlState->getStatus() === 'finished' && $crawlState->getStartDateTime() < $crawlDateTimeOffset) {
+			$this->logger->info('Starting a new theme crawl.');
 			$crawlState->setStatus('running');
 			$crawlState->setCurrentPage(1);
 			$crawlState->setStartDateTime(new \DateTimeImmutable());
+		} elseif ($crawlState->getStatus() === 'finished') {
+			return null;
 		}
 
 		/**
@@ -147,6 +160,12 @@ class WpOrgApiCrawlService
 				$this->ingestTheme($theme, $entityManager);
 			}
 			$entityManager->flush();
+
+			$this->logger->info('Ingested {count} themes from WordPress.org API on page {page} of {pages}.', [
+				'count' => count($themes['themes']),
+				'page' => $crawlState->getCurrentPage(),
+				'pages' => $themes['info']['pages'],
+			]);
 		}
 
 		/**
@@ -159,6 +178,8 @@ class WpOrgApiCrawlService
 		}
 
 		$this->optionsService->set($crawlState);
+
+		return $themes;
 	}
 
 	/**
@@ -171,6 +192,15 @@ class WpOrgApiCrawlService
 	 */
 	public function ingestTheme(array $theme, ObjectManager $entityManager): void
 	{
+
+		/*
+		 * Fix some type issues.
+		 */
+
+		if (!empty($theme['version'])) {
+			$theme['version'] = (string) $theme['version'];
+		}
+
 		$themeSnapshot = new ThemeSnapshot();
 
 		$themeSnapshot->setFromArray($theme);
