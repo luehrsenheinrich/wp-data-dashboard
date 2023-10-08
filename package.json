@@ -1,0 +1,30 @@
+{
+    "devDependencies": {
+        "@babel/core": "^7.17.0",
+        "@babel/preset-env": "^7.16.0",
+        "@symfony/webpack-encore": "^4.0.0",
+        "core-js": "^3.23.0",
+        "regenerator-runtime": "^0.13.9",
+        "webpack": "^5.74.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-notifier": "^1.15.0"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress",
+        "serve": "docker-compose up -d && symfony serve -d",
+        "reset:fixtures": "symfony console doctrine:fixtures:load",
+        "reset:db": "symfony console doctrine:schema:drop --force && symfony console doctrine:schema:create",
+        "migrate": "symfony console doctrine:cache:clear-metadata -n && symfony console doctrine:migrations:diff --allow-empty-diff -n && symfony console doctrine:migrations:migrate -n --allow-no-migration",
+        "stop": "docker-compose stop && symfony local:serve:stop",
+        "lint:js": "eslint ./*.js ./assets/**/*.js",
+        "lint:js:fix": "eslint ./*.js ./assets/**/*.js --fix",
+        "lint": "npm run lint:js",
+        "start": "composer install && npm install && npm run build && npm run serve",
+        "version": "composer run update-version && git add -A"
+    }
+}
