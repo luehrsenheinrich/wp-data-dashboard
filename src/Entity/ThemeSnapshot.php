@@ -6,6 +6,8 @@ use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
 use App\Entity\EntityTraits\SlugTrait;
 use App\Repository\ThemeSnapshotRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
@@ -53,6 +55,14 @@ class ThemeSnapshot implements TimestampableInterface
 
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $template = null;
+
+	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
+	private Collection $tags;
+
+	public function __construct()
+	{
+		$this->tags = new ArrayCollection();
+	}
 
 	/**
 	 * Get the value of slug
@@ -206,6 +216,30 @@ class ThemeSnapshot implements TimestampableInterface
 	public function setTemplate(?string $template): static
 	{
 		$this->template = $template;
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection<int, ThemeTag>
+	 */
+	public function getTags(): Collection
+	{
+		return $this->tags;
+	}
+
+	public function addTag(ThemeTag $tag): static
+	{
+		if (!$this->tags->contains($tag)) {
+			$this->tags->add($tag);
+		}
+
+		return $this;
+	}
+
+	public function removeTag(ThemeTag $tag): static
+	{
+		$this->tags->removeElement($tag);
 
 		return $this;
 	}

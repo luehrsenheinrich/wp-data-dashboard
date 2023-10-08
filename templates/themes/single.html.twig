@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ThemesController!{% endblock %}
+
+{% block body %}
+<h1>{{theme.name}}</h1>
+<p>{{theme.description|raw}}</p>
+<img src="{{theme.screenshotUrl}}" alt="{{theme.name}}" />
+{% for tag in theme.tags %}
+	<a href="#">{{tag.name}}</a>
+{% endfor %}
+{% endblock %}

@@ -8,12 +8,16 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\ThemeSnapshot;
+use App\Entity\ThemeTag;
 use App\Options\ThemeCrawlerStateOption;
+use App\Repository\ThemeSnapshotRepository;
+use App\Repository\ThemeTagRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class WpOrgApiCrawlService
 {
@@ -53,6 +57,7 @@ class WpOrgApiCrawlService
 		private OptionsService $optionsService,
 		private LoggerInterface $logger,
 		private ContainerBagInterface $params,
+		private ThemeTagRepository $themeTagRepository,
 	) {
 		$this->dateTimeOffset = $this->params->get('app.wp_crawl_time_offset');
 		$this->perPage = intval($this->params->get('app.wp_crawl_per_page'));
@@ -98,6 +103,7 @@ class WpOrgApiCrawlService
 			'request[page]' => $page,
 			'request[per_page]' => $perPage,
 			'request[fields][active_installs]' => true,
+			'request[fields][tags]' => true,
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
@@ -149,6 +155,9 @@ class WpOrgApiCrawlService
 			$crawlState->setStartDateTime(new \DateTimeImmutable());
 		}
 
+		/**
+		 * The themes from the API.
+		 */
 		$themes = $this->requestThemes($crawlState->getCurrentPage(), $this->perPage);
 
 		/**
@@ -156,16 +165,70 @@ class WpOrgApiCrawlService
 		 */
 		if (!empty($themes['themes'])) {
 			$entityManager = $this->doctrine->getManager();
+
 			foreach ($themes['themes'] as $theme) {
 				$this->ingestTheme($theme, $entityManager);
 			}
+
 			$entityManager->flush();
+			$entityManager->clear();
 
 			$this->logger->info('Ingested {count} themes from WordPress.org API on page {page} of {pages}.', [
 				'count' => count($themes['themes']),
 				'page' => $crawlState->getCurrentPage(),
 				'pages' => $themes['info']['pages'],
 			]);
+
+
+			/**
+			 * @var ThemeSnapshotRepository $themeSnapshotRepository
+			 */
+			$themeSnapshotRepository = $this->doctrine->getRepository(ThemeSnapshot::class);
+
+			/**
+			 * Load the theme entites that we just ingested.
+			 */
+			$themeEntities = $themeSnapshotRepository->findNewestThemeSnapshotBySlugs(array_column($themes['themes'], 'slug'));
+			$tagEntities = $this->prepareTags($themes['themes'], $entityManager);
+
+			/**
+			 * An array of theme entities, keyed by slug.
+			 *
+			 * @var array<string, ThemeTag> $tagEntitesArray
+			 */
+			$tagEntitiesArray = [];
+			foreach ($tagEntities as $tagEntity) {
+				$tagEntitiesArray[$tagEntity->getSlug()] = $tagEntity;
+			}
+
+			/**
+			 * An array of theme entities, keyed by slug.
+			 *
+			 * @var array<string, ThemeSnapshot> $themeEntitiesArray
+			 */
+			$themeEntitiesArray = [];
+			foreach ($themeEntities as $themeEntity) {
+				$themeEntitiesArray[$themeEntity->getSlug()] = $themeEntity;
+			}
+
+			foreach ($themes['themes'] as $theme) {
+				if (empty($theme['tags'])) {
+					continue;
+				}
+
+				$themeEntity = $themeEntitiesArray[$theme['slug']];
+
+				foreach ($theme['tags'] as $tag) {
+					$tagSlug = (new AsciiSlugger())->slug($tag)->lower()->toString();
+					$themeEntitiesArray[$theme['slug']]
+						->addTag($tagEntitiesArray[$tagSlug]);
+				}
+
+				$entityManager->persist($themeEntitiesArray[$theme['slug']]);
+			}
+
+			$entityManager->flush();
+			$entityManager->clear();
 		}
 
 		/**
@@ -192,7 +255,6 @@ class WpOrgApiCrawlService
 	 */
 	public function ingestTheme(array $theme, ObjectManager $entityManager): void
 	{
-
 		/*
 		 * Fix some type issues.
 		 */
@@ -206,5 +268,44 @@ class WpOrgApiCrawlService
 		$themeSnapshot->setFromArray($theme);
 
 		$entityManager->persist($themeSnapshot);
+	}
+
+	/**
+	 * Prepare the tags for ingestion.
+	 *
+	 * @param array $themes The themes to prepare the tags for.
+	 * @param ObjectManager $entityManager The entity manager to use.
+	 *
+	 * @return array
+	 */
+	public function prepareTags(array $themes, ObjectManager $entityManager): array
+	{
+		$tags = [];
+
+		foreach ($themes as $theme) {
+			if (!empty($theme['tags'])) {
+				foreach ($theme['tags'] as $tag) {
+					$tagSlug = (new AsciiSlugger())->slug($tag)->lower()->toString();
+					$tags[$tagSlug] = $tag;
+				}
+			}
+		}
+
+		$tagEntities = $this->themeTagRepository->findBySlugs(array_keys($tags));
+
+		foreach ($tagEntities as $tagEntity) {
+			unset($tags[$tagEntity->getSlug()]);
+		}
+
+		foreach ($tags as $name => $tag) {
+			$tagEntity = new ThemeTag();
+			$tagEntity->setName($tag);
+			$tagEntity->setSlug($name);
+
+			$entityManager->persist($tagEntity);
+			$tagEntities[] = $tagEntity;
+		}
+
+		return $tagEntities;
 	}
 }
