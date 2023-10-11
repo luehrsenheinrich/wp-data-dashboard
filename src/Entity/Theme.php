@@ -47,6 +47,10 @@ class Theme implements TimestampableInterface
 	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
 	private Collection $tags;
 
+	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'])]
+	#[ORM\JoinColumn(nullable: false)]
+	private ?ThemeAuthor $author = null;
+
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
@@ -180,6 +184,22 @@ class Theme implements TimestampableInterface
 	public function removeTag(ThemeTag $tag): static
 	{
 		$this->tags->removeElement($tag);
+
+		return $this;
+	}
+
+	public function getAuthor(): ?ThemeAuthor
+	{
+		if ($this->author === null) {
+			$this->author = new ThemeAuthor();
+		}
+
+		return $this->author;
+	}
+
+	public function setAuthor(?ThemeAuthor $author): static
+	{
+		$this->author = $author;
 
 		return $this;
 	}

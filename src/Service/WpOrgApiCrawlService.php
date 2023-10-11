@@ -8,9 +8,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Theme;
+use App\Entity\ThemeAuthor;
 use App\Entity\ThemeTag;
 use App\Message\ThemeInfoCrawl;
 use App\Options\ThemeCrawlerStateOption;
+use App\Repository\ThemeAuthorRepository;
 use App\Repository\ThemeTagRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -47,6 +49,11 @@ class WpOrgApiCrawlService
 	 * The datetime offset after which we need to crawl again.
 	 */
 	protected $dateTimeOffset = '-5 minutes';
+
+	/**
+	 * An array of ThemeAuthor entities indexed by their user_nicename.
+	 */
+	protected $themeAuthors = [];
 
 	/**
 	 * The constructor.
@@ -106,6 +113,7 @@ class WpOrgApiCrawlService
 			'request[fields][active_installs]' => 0,
 			'request[fields][num_ratings]' => 0,
 			'request[fields][rating]' => 0,
+			'request[fields][extended_author]' => 1,
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
@@ -181,11 +189,45 @@ class WpOrgApiCrawlService
 			$theme['version'] = (string) $theme['version'];
 		}
 
+		/**
+		 * Fix the false state of the [author][author_url] property.
+		 */
+		if (isset($theme['author']['author_url']) && $theme['author']['author_url'] === false) {
+			$theme['author']['author_url'] = null;
+		}
+
+		/**
+		 * Fix the false state of the [author][author] property.
+		 */
+		if (isset($theme['author']['author']) && $theme['author']['author'] === false) {
+			$theme['author']['author'] = null;
+		}
+
+		/**
+		 * @var ThemeAuthorRepository $themeAuthorRepository
+		 */
+		$themeAuthorRepository = $entityManager->getRepository(ThemeAuthor::class);
+
+		if (!isset($this->themeAuthors[$theme['author']['user_nicename']])) {
+			$this->themeAuthors[$theme['author']['user_nicename']] = $themeAuthorRepository->findOneByUserNicename($theme['author']['user_nicename']);
+		}
+
 		if ($themeEntity === null) {
 			$themeEntity = new Theme();
 		}
 
+		if ($this->themeAuthors[$theme['author']['user_nicename']] instanceof ThemeAuthor) {
+			$themeAuthor = $this->themeAuthors[$theme['author']['user_nicename']];
+		} else {
+			$themeAuthor = $themeEntity->getAuthor();
+			$this->themeAuthors[$theme['author']['user_nicename']] = $themeAuthor;
+		}
+
+		$themeAuthor->setFromArray($theme['author']);
+		unset($theme['author']);
+
 		$themeEntity->setFromArray($theme);
+		$themeEntity->setAuthor($themeAuthor);
 
 		$entityManager->persist($themeEntity);
 	}
