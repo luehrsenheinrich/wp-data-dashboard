@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace App\Options;
 
-class ThemeCrawlerStateOption extends AbstractOptions
+class ThemeInfosCrawlerStateOption extends AbstractOptions
 {
 	/**
 	 * The start date and time of the crawl.
@@ -25,22 +25,14 @@ class ThemeCrawlerStateOption extends AbstractOptions
 	private ?string $status;
 
 	/**
-	 * The current page number.
-	 *
-	 * @var int
-	 */
-	private ?int $currentPage;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct()
 	{
-		$now = new \DateTime();
+		$now = new \DateTime("-10 years");
 
 		$this->startDateTime = $now;
 		$this->status = 'running';
-		$this->currentPage = 1;
 	}
 
 	/**
@@ -103,33 +95,5 @@ class ThemeCrawlerStateOption extends AbstractOptions
 		}
 
 		return $this->status;
-	}
-
-	/**
-	 * Set the current page number.
-	 *
-	 * @param int $currentPage The current page number.
-	 *
-	 * @return self
-	 */
-	public function setCurrentPage(int $currentPage): self
-	{
-		$this->currentPage = $currentPage;
-
-		return $this;
-	}
-
-	/**
-	 * Get the current page number.
-	 *
-	 * @return int
-	 */
-	public function getCurrentPage(): int
-	{
-		if (!$this->currentPage) {
-			$this->currentPage = 1;
-		}
-
-		return $this->currentPage;
 	}
 }

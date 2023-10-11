@@ -24,18 +24,7 @@ class CrawlThemesCommand extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
-		try {
-			$themes = $this->crawlService->crawlThemes();
-			if ($themes) {
-				$output->writeln("Crawled themes from page {$themes['info']['page']} of {$themes['info']['pages']}.");
-			} else {
-				$output->writeln('No themes crawled.');
-			}
-		} catch (\Exception $e) {
-			$output->writeln($e->getMessage());
-			return Command::FAILURE;
-		}
-
+		$this->crawlService->maybeCrawlThemeInfos();
 		return Command::SUCCESS;
 	}
 }

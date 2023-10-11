@@ -9,15 +9,15 @@ namespace App\Service;
 
 use App\Entity\Theme;
 use App\Entity\ThemeTag;
+use App\Message\ThemeInfoCrawl;
 use App\Options\ThemeCrawlerStateOption;
-use App\Repository\ThemeRepository;
 use App\Repository\ThemeTagRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class WpOrgApiCrawlService
 {
@@ -58,6 +58,7 @@ class WpOrgApiCrawlService
 		private LoggerInterface $logger,
 		private ContainerBagInterface $params,
 		private ThemeTagRepository $themeTagRepository,
+		private MessageBusInterface $bus,
 	) {
 		$this->dateTimeOffset = $this->params->get('app.wp_crawl_time_offset');
 		$this->perPage = intval($this->params->get('app.wp_crawl_per_page'));
@@ -89,21 +90,22 @@ class WpOrgApiCrawlService
 	}
 
 	/**
-	 * Request the themes from the WordPress.org API.
+	 * Request theme infos from the WordPress.org API.
+	 * This method serves to fetch the more static theme data from the API.
 	 *
 	 * @param int $page The page to request.
-	 * @param int $perPage The number of themes to request.
 	 *
 	 * @return array The themes from the API.
 	 */
-	public function requestThemes(int $page = 1, int $perPage = 5): array
+	public function requestThemeInfos(int $page = 1): array
 	{
 		$params = [
 			'action' => 'query_themes',
 			'request[page]' => $page,
-			'request[per_page]' => $perPage,
-			'request[fields][active_installs]' => true,
-			'request[fields][tags]' => true,
+			'request[per_page]' => $this->perPage,
+			'request[fields][active_installs]' => 0,
+			'request[fields][num_ratings]' => 0,
+			'request[fields][rating]' => 0,
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
@@ -114,18 +116,25 @@ class WpOrgApiCrawlService
 	}
 
 	/**
-	 * Crawl and ingest the themes from the WordPress.org API.
+	 * Crawl and ingest the theme infos from the WordPress.org API.
 	 * This method does not have properties, as it handles the crawl state
 	 * with an option from the database.
 	 *
-	 * @return array The themes object from the API.
+	 * @return void
 	 */
-	public function crawlThemes(): ?array
+	public function maybeCrawlThemeInfos()
 	{
 		/**
 		 * @var ThemeCrawlerStateOption $crawlState
 		 */
-		$crawlState = $this->optionsService->get('theme_crawler_state');
+		$crawlState = $this->optionsService->get('theme_info_crawler_state');
+
+		/**
+		 * If no crawl date time is set, set it to 0.
+		 */
+		if (!$crawlState->getStartDateTime()) {
+			$crawlState->setStartDateTime(new \DateTimeImmutable("-10 years"));
+		}
 
 		/**
 		 * A datetime in the past that we use to check if we need to crawl.
@@ -139,110 +148,20 @@ class WpOrgApiCrawlService
 		 * If the state is finished, but the datetime offset has been reached,
 		 * start a new crawl.
 		 */
-		if ($crawlState->getStatus() === 'finished' && $crawlState->getStartDateTime() < $crawlDateTimeOffset) {
+		if ($crawlState->getStartDateTime() < $crawlDateTimeOffset) {
 			$this->logger->info('Starting a new theme crawl.');
 			$crawlState->setStatus('running');
-			$crawlState->setCurrentPage(1);
 			$crawlState->setStartDateTime(new \DateTimeImmutable());
-		} elseif ($crawlState->getStatus() === 'finished') {
+			$this->optionsService->set($crawlState);
+		} else {
+			$this->logger->info('Theme crawl already running.');
 			return null;
 		}
 
 		/**
-		 * If no crawl date time is set, set it to now.
+		 * Send the initial crawl of the first page to the messenger bus.
 		 */
-		if (!$crawlState->getStartDateTime()) {
-			$crawlState->setStartDateTime(new \DateTimeImmutable());
-		}
-
-		/**
-		 * The themes from the API.
-		 */
-		$themes = $this->requestThemes($crawlState->getCurrentPage(), $this->perPage);
-
-		/**
-		 * Check if themes are available in the response.
-		 */
-		if (!empty($themes['themes'])) {
-			$entityManager = $this->doctrine->getManager();
-
-			foreach ($themes['themes'] as $theme) {
-				$this->ingestTheme($theme, $entityManager);
-			}
-
-			$entityManager->flush();
-			$entityManager->clear();
-
-			$this->logger->info('Ingested {count} themes from WordPress.org API on page {page} of {pages}.', [
-				'count' => count($themes['themes']),
-				'page' => $crawlState->getCurrentPage(),
-				'pages' => $themes['info']['pages'],
-			]);
-
-
-			/**
-			 * @var ThemeRepository $themeRepository
-			 */
-			$themeRepository = $this->doctrine->getRepository(Theme::class);
-
-			/**
-			 * Load the theme entites that we just ingested.
-			 */
-			$themeEntities = $themeRepository->findNewestThemeBySlugs(array_column($themes['themes'], 'slug'));
-			$tagEntities = $this->prepareTags($themes['themes'], $entityManager);
-
-			/**
-			 * An array of theme entities, keyed by slug.
-			 *
-			 * @var array<string, ThemeTag> $tagEntitesArray
-			 */
-			$tagEntitiesArray = [];
-			foreach ($tagEntities as $tagEntity) {
-				$tagEntitiesArray[$tagEntity->getSlug()] = $tagEntity;
-			}
-
-			/**
-			 * An array of theme entities, keyed by slug.
-			 *
-			 * @var array<string, Theme> $themeEntitiesArray
-			 */
-			$themeEntitiesArray = [];
-			foreach ($themeEntities as $themeEntity) {
-				$themeEntitiesArray[$themeEntity->getSlug()] = $themeEntity;
-			}
-
-			foreach ($themes['themes'] as $theme) {
-				if (empty($theme['tags'])) {
-					continue;
-				}
-
-				$themeEntity = $themeEntitiesArray[$theme['slug']];
-
-				foreach ($theme['tags'] as $tag) {
-					$tagSlug = (new AsciiSlugger())->slug($tag)->lower()->toString();
-					$themeEntitiesArray[$theme['slug']]
-						->addTag($tagEntitiesArray[$tagSlug]);
-				}
-
-				$entityManager->persist($themeEntitiesArray[$theme['slug']]);
-			}
-
-			$entityManager->flush();
-			$entityManager->clear();
-		}
-
-		/**
-		 * Check if we have reached the last page.
-		 */
-		if ($themes['info']['pages'] <= $themes['info']['page']) {
-			$crawlState->setStatus('finished');
-		} else {
-			$crawlState->setCurrentPage($crawlState->getCurrentPage() + 1);
-		}
-
-		$this->optionsService->set($crawlState);
-
-		return $themes;
+		$this->bus->dispatch(new ThemeInfoCrawl(1));
 	}
 
 	/**
@@ -253,59 +172,21 @@ class WpOrgApiCrawlService
 	 *
 	 * @return void
 	 */
-	public function ingestTheme(array $theme, ObjectManager $entityManager): void
+	public function ingestTheme(array $theme, ObjectManager $entityManager, ?Theme $themeEntity = null): void
 	{
 		/*
 		 * Fix some type issues.
 		 */
-
 		if (!empty($theme['version'])) {
 			$theme['version'] = (string) $theme['version'];
 		}
 
-		$theme = new Theme();
-
-		$theme->setFromArray($theme);
-
-		$entityManager->persist($theme);
-	}
-
-	/**
-	 * Prepare the tags for ingestion.
-	 *
-	 * @param array $themes The themes to prepare the tags for.
-	 * @param ObjectManager $entityManager The entity manager to use.
-	 *
-	 * @return array
-	 */
-	public function prepareTags(array $themes, ObjectManager $entityManager): array
-	{
-		$tags = [];
-
-		foreach ($themes as $theme) {
-			if (!empty($theme['tags'])) {
-				foreach ($theme['tags'] as $tag) {
-					$tagSlug = (new AsciiSlugger())->slug($tag)->lower()->toString();
-					$tags[$tagSlug] = $tag;
-				}
-			}
+		if ($themeEntity === null) {
+			$themeEntity = new Theme();
 		}
 
-		$tagEntities = $this->themeTagRepository->findBySlugs(array_keys($tags));
+		$themeEntity->setFromArray($theme);
 
-		foreach ($tagEntities as $tagEntity) {
-			unset($tags[$tagEntity->getSlug()]);
-		}
-
-		foreach ($tags as $name => $tag) {
-			$tagEntity = new ThemeTag();
-			$tagEntity->setName($tag);
-			$tagEntity->setSlug($name);
-
-			$entityManager->persist($tagEntity);
-			$tagEntities[] = $tagEntity;
-		}
-
-		return $tagEntities;
+		$entityManager->persist($themeEntity);
 	}
 }

@@ -22,19 +22,6 @@ class ThemeRepository extends ServiceEntityRepository
 	}
 
 	/**
-	 * Get the total number of theme snapshots.
-	 *
-	 * @return int
-	 */
-	public function getTotalSnapshots(): int
-	{
-		return $this->createQueryBuilder('t')
-			->select('COUNT(t.id)')
-			->getQuery()
-			->getSingleScalarResult();
-	}
-
-	/**
 	 * Get the total number of themes.
 	 * To get the total number of themes, we need to group by the slug.
 	 *
@@ -49,7 +36,7 @@ class ThemeRepository extends ServiceEntityRepository
 	}
 
 	/**
-	 * Get the newest theme snapshot for a given theme slug.
+	 * Get the newest theme for a given theme slug.
 	 *
 	 * @param string $slug
 	 *
@@ -60,23 +47,33 @@ class ThemeRepository extends ServiceEntityRepository
 		return $this->createQueryBuilder('t')
 			->where('t.slug = :slug')
 			->setParameter('slug', $slug)
-			->orderBy('t.createdAt', 'DESC')
 			->setMaxResults(1)
 			->getQuery()
 			->getOneOrNullResult();
 	}
 
 	/**
-	 * Find the newest theme snapshots for given theme slugs.
+	 * Find the newest themes for given theme slugs.
+	 * Returns an array of Theme entities indexed by their slug.
+	 *
+	 * @param array $themes An array of themes indexed by their slug.
 	 */
-	public function findNewestThemeBySlugs(array $slugs): array
+	public function findThemesBySlugs(array $slugs): array
 	{
-		return $this->createQueryBuilder('t')
+		$themes = $this->createQueryBuilder('t')
 			->where('t.slug IN (:slugs)')
 			->setParameter('slugs', $slugs)
-			->orderBy('t.createdAt', 'DESC')
-			->groupBy('t.slug')
 			->getQuery()
 			->getResult();
+
+		$themesBySlug = array_combine(
+			array_map(
+				static fn (Theme $theme): string => $theme->getSlug(),
+				$themes
+			),
+			$themes
+		);
+
+		return $themesBySlug;
 	}
 }

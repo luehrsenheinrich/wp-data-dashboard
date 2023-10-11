@@ -19,7 +19,7 @@ class Theme implements TimestampableInterface
 {
 	use IdTrait, TimestampableTrait, SetFromArrayTrait;
 
-	#[ORM\Column(nullable: false)]
+	#[ORM\Column(nullable: false, unique: true)]
 	#[Assert\NotBlank]
 	private ?string $slug = null;
 
@@ -31,9 +31,6 @@ class Theme implements TimestampableInterface
 
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $previewUrl = null;
-
-	#[ORM\Column(length: 255)]
-	private ?string $author = null;
 
 	#[ORM\Column(length: 255)]
 	private ?string $screenshotUrl = null;
@@ -111,18 +108,6 @@ class Theme implements TimestampableInterface
 	public function setPreviewUrl(string $previewUrl): static
 	{
 		$this->previewUrl = $previewUrl;
-
-		return $this;
-	}
-
-	public function getAuthor(): ?string
-	{
-		return $this->author;
-	}
-
-	public function setAuthor(string $author): static
-	{
-		$this->author = $author;
 
 		return $this;
 	}
