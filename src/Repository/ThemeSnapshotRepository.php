@@ -2,23 +2,23 @@
 
 namespace App\Repository;
 
-use App\Entity\ThemeSnapshot;
+use App\Entity\Theme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ThemeSnapshot>
+ * @extends ServiceEntityRepository<Theme>
  *
- * @method ThemeSnapshot|null find($id, $lockMode = null, $lockVersion = null)
- * @method ThemeSnapshot|null findOneBy(array $criteria, array $orderBy = null)
- * @method ThemeSnapshot[]    findAll()
- * @method ThemeSnapshot[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Theme|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Theme|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Theme[]    findAll()
+ * @method Theme[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ThemeSnapshotRepository extends ServiceEntityRepository
+class ThemeRepository extends ServiceEntityRepository
 {
 	public function __construct(ManagerRegistry $registry)
 	{
-		parent::__construct($registry, ThemeSnapshot::class);
+		parent::__construct($registry, Theme::class);
 	}
 
 	/**
@@ -53,9 +53,9 @@ class ThemeSnapshotRepository extends ServiceEntityRepository
 	 *
 	 * @param string $slug
 	 *
-	 * @return ThemeSnapshot|null
+	 * @return Theme|null
 	 */
-	public function getNewestThemeSnapshot(string $slug): ?ThemeSnapshot
+	public function getNewestTheme(string $slug): ?Theme
 	{
 		return $this->createQueryBuilder('t')
 			->where('t.slug = :slug')
@@ -69,7 +69,7 @@ class ThemeSnapshotRepository extends ServiceEntityRepository
 	/**
 	 * Find the newest theme snapshots for given theme slugs.
 	 */
-	public function findNewestThemeSnapshotBySlugs(array $slugs): array
+	public function findNewestThemeBySlugs(array $slugs): array
 	{
 		return $this->createQueryBuilder('t')
 			->where('t.slug IN (:slugs)')

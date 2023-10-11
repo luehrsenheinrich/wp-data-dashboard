@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\ThemeSnapshot;
+use App\Entity\Theme;
 use App\Service\WpOrgApiCrawlService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

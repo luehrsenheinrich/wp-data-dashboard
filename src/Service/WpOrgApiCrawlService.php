@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\ThemeSnapshot;
+use App\Entity\Theme;
 use App\Entity\ThemeTag;
 use App\Options\ThemeCrawlerStateOption;
-use App\Repository\ThemeSnapshotRepository;
+use App\Repository\ThemeRepository;
 use App\Repository\ThemeTagRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -181,14 +181,14 @@ class WpOrgApiCrawlService
 
 
 			/**
-			 * @var ThemeSnapshotRepository $themeSnapshotRepository
+			 * @var ThemeRepository $themeRepository
 			 */
-			$themeSnapshotRepository = $this->doctrine->getRepository(ThemeSnapshot::class);
+			$themeRepository = $this->doctrine->getRepository(Theme::class);
 
 			/**
 			 * Load the theme entites that we just ingested.
 			 */
-			$themeEntities = $themeSnapshotRepository->findNewestThemeSnapshotBySlugs(array_column($themes['themes'], 'slug'));
+			$themeEntities = $themeRepository->findNewestThemeBySlugs(array_column($themes['themes'], 'slug'));
 			$tagEntities = $this->prepareTags($themes['themes'], $entityManager);
 
 			/**
@@ -204,7 +204,7 @@ class WpOrgApiCrawlService
 			/**
 			 * An array of theme entities, keyed by slug.
 			 *
-			 * @var array<string, ThemeSnapshot> $themeEntitiesArray
+			 * @var array<string, Theme> $themeEntitiesArray
 			 */
 			$themeEntitiesArray = [];
 			foreach ($themeEntities as $themeEntity) {
@@ -263,11 +263,11 @@ class WpOrgApiCrawlService
 			$theme['version'] = (string) $theme['version'];
 		}
 
-		$themeSnapshot = new ThemeSnapshot();
+		$theme = new Theme();
 
-		$themeSnapshot->setFromArray($theme);
+		$theme->setFromArray($theme);
 
-		$entityManager->persist($themeSnapshot);
+		$entityManager->persist($theme);
 	}
 
 	/**

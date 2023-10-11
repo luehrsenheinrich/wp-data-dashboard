@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
 use App\Entity\EntityTraits\SlugTrait;
-use App\Repository\ThemeSnapshotRepository;
+use App\Repository\ThemeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -14,8 +14,8 @@ use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ThemeSnapshotRepository::class)]
-class ThemeSnapshot implements TimestampableInterface
+#[ORM\Entity(repositoryClass: ThemeRepository::class)]
+class Theme implements TimestampableInterface
 {
 	use IdTrait, TimestampableTrait, SetFromArrayTrait;
 
@@ -37,15 +37,6 @@ class ThemeSnapshot implements TimestampableInterface
 
 	#[ORM\Column(length: 255)]
 	private ?string $screenshotUrl = null;
-
-	#[ORM\Column]
-	private ?int $rating = null;
-
-	#[ORM\Column]
-	private ?int $numRatings = null;
-
-	#[ORM\Column]
-	private ?int $activeInstalls = null;
 
 	#[ORM\Column(length: 255)]
 	private ?string $homepage = null;
@@ -144,42 +135,6 @@ class ThemeSnapshot implements TimestampableInterface
 	public function setScreenshotUrl(string $screenshotUrl): static
 	{
 		$this->screenshotUrl = $screenshotUrl;
-
-		return $this;
-	}
-
-	public function getRating(): ?int
-	{
-		return $this->rating;
-	}
-
-	public function setRating(int $rating): static
-	{
-		$this->rating = $rating;
-
-		return $this;
-	}
-
-	public function getNumRatings(): ?int
-	{
-		return $this->numRatings;
-	}
-
-	public function setNumRatings(int $numRatings): static
-	{
-		$this->numRatings = $numRatings;
-
-		return $this;
-	}
-
-	public function getActiveInstalls(): ?int
-	{
-		return $this->activeInstalls;
-	}
-
-	public function setActiveInstalls(int $activeInstalls): static
-	{
-		$this->activeInstalls = $activeInstalls;
 
 		return $this;
 	}

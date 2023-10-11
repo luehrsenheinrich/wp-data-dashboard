@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\ThemeSnapshotRepository;
+use App\Repository\ThemeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ThemesController extends AbstractController
 {
 	public function __construct(
-		private ThemeSnapshotRepository $themeSnapshotRepository
+		private ThemeRepository $themeRepository
 	) {
 	}
 
@@ -18,8 +18,8 @@ class ThemesController extends AbstractController
 	public function index(): Response
 	{
 		return $this->render('themes/index.html.twig', [
-			'total_snapshots' => $this->themeSnapshotRepository->getTotalSnapshots(),
-			'total_themes' => $this->themeSnapshotRepository->getTotalThemes(),
+			'total_snapshots' => $this->themeRepository->getTotalSnapshots(),
+			'total_themes' => $this->themeRepository->getTotalThemes(),
 		]);
 	}
 
@@ -27,7 +27,7 @@ class ThemesController extends AbstractController
 	public function single(string $slug): Response
 	{
 		return $this->render('themes/single.html.twig', [
-			'theme' => $this->themeSnapshotRepository->getNewestThemeSnapshot($slug),
+			'theme' => $this->themeRepository->getNewestTheme($slug),
 		]);
 	}
 }
