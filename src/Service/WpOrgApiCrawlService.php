@@ -127,6 +127,24 @@ class WpOrgApiCrawlService
 	}
 
 	/**
+	 * Request the theme tags from the WordPress.org API.
+	 *
+	 * @return array The theme tags from the API.
+	 */
+	public function requestThemeTags(): array
+	{
+		$params = [
+			'action' => 'hot_tags',
+		];
+
+		$this->logger->info('Requesting theme tags from WordPress.org API.', [
+			'params' => $params,
+		]);
+
+		return $this->request($this->themeEndpoint, $params);
+	}
+
+	/**
 	 * Crawl and ingest the theme infos from the WordPress.org API.
 	 * This method does not have properties, as it handles the crawl state
 	 * with an option from the database.
@@ -190,13 +208,6 @@ class WpOrgApiCrawlService
 		$crawlState = $this->optionsService->get('theme_tags_crawler_state');
 
 		/**
-		 * If no crawl date time is set, set it to 0.
-		 */
-		if (!$crawlState->getStartDateTime()) {
-			$crawlState->setStartDateTime(new \DateTimeImmutable("-10 years"));
-		}
-
-		/**
 		 * A datetime in the past that we use to check if we need to crawl.
 		 *
 		 * @var \DateTimeInterface $crawlDateTimeOffset
@@ -221,7 +232,7 @@ class WpOrgApiCrawlService
 		/**
 		 * Send the initial crawl of the first page to the messenger bus.
 		 */
-		$this->bus->dispatch(new ThemeTagsCrawl(1));
+		$this->bus->dispatch(new ThemeTagsCrawl());
 	}
 
 	/**
@@ -328,5 +339,65 @@ class WpOrgApiCrawlService
 		$themeEntity->setAuthor($themeAuthor);
 
 		$entityManager->persist($themeEntity);
+	}
+
+	/**
+	 * The method that ingests the theme tags from the WordPress.org API.
+	 *
+	 * @param array $apiTags The theme tags from the API.
+	 *
+	 * @return void
+	 */
+	public function ingestTags(array $apiTags)
+	{
+		if (!empty($apiTags)) {
+			$tagSlugs = array_map(
+				static fn (array $tag): string => $tag['slug'],
+				$apiTags
+			);
+
+			$this->logger->info('Ingesting {count} theme tags.', [
+				'count' => count($apiTags),
+			]);
+
+			/**
+			 * @var ThemeTagRepository $themeTagRepository
+			 */
+			$themeTagRepository = $this->doctrine->getRepository(ThemeTag::class);
+			$themeTagEntities = $themeTagRepository->findBySlugs($tagSlugs);
+
+			$entityManager = $this->doctrine->getManager();
+
+			foreach ($apiTags as $apiTag) {
+				if (isset($themeTagEntities[$apiTag['slug']])) {
+					$themeTagEntity = $themeTagEntities[$apiTag['slug']];
+				} else {
+					$themeTagEntity = null;
+				}
+
+				$this->ingestTag($apiTag, $entityManager, $themeTagEntity);
+			}
+
+			$entityManager->flush();
+			$entityManager->clear();
+		}
+	}
+
+	/**
+	 * Ingest a theme tag from the WordPress.org API into the database.
+	 *
+	 * @param array $tag The theme tag to ingest.
+	 *
+	 * @return void
+	 */
+	public function ingestTag(array $tag, ObjectManager $entityManager, ?ThemeTag $themeTagEntity = null): void
+	{
+		if ($themeTagEntity === null) {
+			$themeTagEntity = new ThemeTag();
+		}
+
+		$themeTagEntity->setFromArray($tag);
+
+		$entityManager->persist($themeTagEntity);
 	}
 }
