@@ -11,6 +11,7 @@ use App\Entity\Theme;
 use App\Entity\ThemeAuthor;
 use App\Entity\ThemeTag;
 use App\Message\ThemeInfoCrawl;
+use App\Message\ThemeTagsCrawl;
 use App\Options\ThemeCrawlerStateOption;
 use App\Repository\ThemeAuthorRepository;
 use App\Repository\ThemeTagRepository;
@@ -175,6 +176,55 @@ class WpOrgApiCrawlService
 	}
 
 	/**
+	 * Crawl and ingest the theme tags from the WordPress.org API.
+	 * This method does not have properties, as it handles the crawl state
+	 * with an option from the database.
+	 *
+	 * @return void
+	 */
+	public function maybeCrawlThemeTags()
+	{
+				/**
+		 * @var ThemeCrawlerStateOption $crawlState
+		 */
+		$crawlState = $this->optionsService->get('theme_tags_crawler_state');
+
+		/**
+		 * If no crawl date time is set, set it to 0.
+		 */
+		if (!$crawlState->getStartDateTime()) {
+			$crawlState->setStartDateTime(new \DateTimeImmutable("-10 years"));
+		}
+
+		/**
+		 * A datetime in the past that we use to check if we need to crawl.
+		 *
+		 * @var \DateTimeInterface $crawlDateTimeOffset
+		 */
+		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffset);
+
+		/**
+		 * Check if we actually need to crawl.
+		 * If the state is finished, but the datetime offset has been reached,
+		 * start a new crawl.
+		 */
+		if ($crawlState->getStartDateTime() < $crawlDateTimeOffset) {
+			$this->logger->info('Starting a new theme crawl.');
+			$crawlState->setStatus('running');
+			$crawlState->setStartDateTime(new \DateTimeImmutable());
+			$this->optionsService->set($crawlState);
+		} else {
+			$this->logger->info('Theme crawl already running.');
+			return null;
+		}
+
+		/**
+		 * Send the initial crawl of the first page to the messenger bus.
+		 */
+		$this->bus->dispatch(new ThemeTagsCrawl(1));
+	}
+
+	/**
 	 * The method that ingests the themes from the WordPress.org API.
 	 *
 	 * @param array $apiThemes The themes from the API.
@@ -221,7 +271,7 @@ class WpOrgApiCrawlService
 					$themeEntity = null;
 				}
 
-				$this->ingestTheme($apiTheme, $entityManager, $themeEntity);
+				$this->ingestThemeInfos($apiTheme, $entityManager, $themeEntity);
 			}
 
 			$entityManager->flush();
@@ -237,7 +287,7 @@ class WpOrgApiCrawlService
 	 *
 	 * @return void
 	 */
-	public function ingestTheme(array $theme, ObjectManager $entityManager, ?Theme $themeEntity = null): void
+	public function ingestThemeInfos(array $theme, ObjectManager $entityManager, ?Theme $themeEntity = null): void
 	{
 		/*
 		 * Fix some type issues.

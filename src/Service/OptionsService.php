@@ -9,6 +9,7 @@ namespace App\Service;
 
 use App\Entity\Options;
 use App\Options\ThemeInfosCrawlerStateOption;
+use App\Options\ThemeTagsCrawlerStateOption;
 use App\Repository\OptionsRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -43,6 +44,7 @@ class OptionsService
 	 */
 	private array $optionsMap = [
 		'theme_info_crawler_state' => ThemeInfosCrawlerStateOption::class,
+		'theme_tags_crawler_state' => ThemeTagsCrawlerStateOption::class,
 	];
 
 	/**

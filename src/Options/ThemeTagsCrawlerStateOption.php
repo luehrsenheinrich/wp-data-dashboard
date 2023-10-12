@@ -1,13 +1,13 @@
 <?php
 /**
- * An option class that holds the theme crawler state for the theme infos crawl.
+ * An option class that holds the theme crawler state for the tags crawl.
  */
 
 declare(strict_types=1);
 
 namespace App\Options;
 
-class ThemeInfosCrawlerStateOption extends AbstractOptions
+class ThemeTagsCrawlerStateOption extends AbstractOptions
 {
 	/**
 	 * The start date and time of the crawl.

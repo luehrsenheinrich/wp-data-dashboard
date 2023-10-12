@@ -36,6 +36,7 @@ class HomeController extends AbstractController
 	{
 
 		$this->wpOrg->maybeCrawlThemeInfos();
+		$this->wpOrg->maybeCrawlThemeTags();
 
 		return $this->render(
 			'home/index.html.twig',
