@@ -37,4 +37,27 @@ class ThemeAuthorRepository extends ServiceEntityRepository
 			->getQuery()
 			->getOneOrNullResult();
 	}
+
+	/**
+	 * Find all theme authors by their user_nicename.
+	 *
+	 * @param string[] $userNicenames An array of user_nicenames.
+	 *
+	 * @return ThemeAuthor[] An array of ThemeAuthor entities, indexed by their user_nicename.
+	 */
+	public function findByUserNicenames(array $userNicenames): array
+	{
+		$authors = $this->createQueryBuilder('ta')
+			->where('ta.userNicename IN (:userNicenames)')
+			->setParameter('userNicenames', $userNicenames)
+			->getQuery()
+			->getResult();
+
+		$indexedAuthors = [];
+		foreach ($authors as $author) {
+			$indexedAuthors[$author->getUserNicename()] = $author;
+		}
+
+		return $indexedAuthors;
+	}
 }

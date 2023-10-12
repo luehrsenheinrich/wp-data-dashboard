@@ -52,6 +52,8 @@ class WpOrgApiCrawlService
 
 	/**
 	 * An array of ThemeAuthor entities indexed by their user_nicename.
+	 *
+	 * @var ThemeAuthor[]
 	 */
 	protected $themeAuthors = [];
 
@@ -173,6 +175,61 @@ class WpOrgApiCrawlService
 	}
 
 	/**
+	 * The method that ingests the themes from the WordPress.org API.
+	 *
+	 * @param array $apiThemes The themes from the API.
+	 *
+	 * @return void
+	 */
+	public function ingestThemes(array $apiThemes)
+	{
+		if (!empty($apiThemes['themes'])) {
+			/**
+			 * Get a list of all the theme slugs.
+			 */
+			$themeSlugs = array_map(
+				static fn (array $theme): string => $theme['slug'],
+				$apiThemes['themes']
+			);
+
+			/**
+			 * Get a list of all the theme author nicenames.
+			 */
+			$nicenames = array_map(
+				static fn (array $theme): string => $theme['author']['user_nicename'],
+				$apiThemes['themes']
+			);
+
+			/**
+			 * @var ThemeRepository $themeRepository
+			 */
+			$themeRepository = $this->doctrine->getRepository(Theme::class);
+			$themeEntities = $themeRepository->findThemesBySlugs($themeSlugs);
+
+			/**
+			 * @var ThemeAuthorRepository $themeAuthorRepository
+			 */
+			$themeAuthorRepository = $this->doctrine->getRepository(ThemeAuthor::class);
+			$this->themeAuthors = $themeAuthorRepository->findByUserNicenames($nicenames);
+
+			$entityManager = $this->doctrine->getManager();
+
+			foreach ($apiThemes['themes'] as $apiTheme) {
+				if (isset($themeEntities[$apiTheme['slug']])) {
+					$themeEntity = $themeEntities[$apiTheme['slug']];
+				} else {
+					$themeEntity = null;
+				}
+
+				$this->ingestTheme($apiTheme, $entityManager, $themeEntity);
+			}
+
+			$entityManager->flush();
+			$entityManager->clear();
+		}
+	}
+
+	/**
 	 * Ingest a theme from the WordPress.org API into the database.
 	 *
 	 * @param array $theme The theme to ingest.
@@ -203,20 +260,11 @@ class WpOrgApiCrawlService
 			$theme['author']['author'] = null;
 		}
 
-		/**
-		 * @var ThemeAuthorRepository $themeAuthorRepository
-		 */
-		$themeAuthorRepository = $entityManager->getRepository(ThemeAuthor::class);
-
-		if (!isset($this->themeAuthors[$theme['author']['user_nicename']])) {
-			$this->themeAuthors[$theme['author']['user_nicename']] = $themeAuthorRepository->findOneByUserNicename($theme['author']['user_nicename']);
-		}
-
 		if ($themeEntity === null) {
 			$themeEntity = new Theme();
 		}
 
-		if ($this->themeAuthors[$theme['author']['user_nicename']] instanceof ThemeAuthor) {
+		if (isset($this->themeAuthors[$theme['author']['user_nicename']]) && $this->themeAuthors[$theme['author']['user_nicename']] instanceof ThemeAuthor) {
 			$themeAuthor = $this->themeAuthors[$theme['author']['user_nicename']];
 		} else {
 			$themeAuthor = $themeEntity->getAuthor();

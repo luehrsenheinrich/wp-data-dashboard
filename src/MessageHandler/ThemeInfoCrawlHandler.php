@@ -40,43 +40,12 @@ class ThemeInfoCrawlHandler
 	{
 		$currentPage = $message->getPage();
 
-
 		$this->logger->info('Crawling theme info page {page}.', [
 			'page' => $currentPage,
 		]);
 
 		$apiThemes = $this->crawlService->requestThemeInfos($currentPage);
-
-		if (!empty($apiThemes['themes'])) {
-			/**
-			 * Get a list of all the theme slugs.
-			 */
-			$themeSlugs = array_map(
-				static fn (array $theme): string => $theme['slug'],
-				$apiThemes['themes']
-			);
-
-			/**
-			 * @var ThemeRepository $themeRepository
-			 */
-			$themeRepository = $this->doctrine->getRepository(Theme::class);
-			$themeEntities = $themeRepository->findThemesBySlugs($themeSlugs);
-
-			$entityManager = $this->doctrine->getManager();
-
-			foreach ($apiThemes['themes'] as $apiTheme) {
-				if (isset($themeEntities[$apiTheme['slug']])) {
-					$themeEntity = $themeEntities[$apiTheme['slug']];
-				} else {
-					$themeEntity = null;
-				}
-
-				$this->crawlService->ingestTheme($apiTheme, $entityManager, $themeEntity);
-			}
-
-			$entityManager->flush();
-			$entityManager->clear();
-		}
+		$this->crawlService->ingestThemes($apiThemes);
 
 		/**
 		 * Check if we have reached the end of the pages.
