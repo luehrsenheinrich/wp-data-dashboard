@@ -9,11 +9,15 @@ namespace App\Service;
 
 use App\Entity\Theme;
 use App\Entity\ThemeAuthor;
+use App\Entity\ThemeStatSnapshot;
 use App\Entity\ThemeTag;
 use App\Message\ThemeInfoCrawl;
+use App\Message\ThemeStatsCrawl;
 use App\Message\ThemeTagsCrawl;
 use App\Options\ThemeCrawlerStateOption;
+use App\Options\ThemeStatsCrawlerStateOption;
 use App\Repository\ThemeAuthorRepository;
+use App\Repository\ThemeRepository;
 use App\Repository\ThemeTagRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -47,9 +51,21 @@ class WpOrgApiCrawlService
 	protected $perPage = 1000;
 
 	/**
+	 * The number of records to request per page for a large crawl.
+	 *
+	 * @var int
+	 */
+	protected $perPageLarge = 10000;
+
+	/**
 	 * The datetime offset after which we need to crawl again.
 	 */
 	protected $dateTimeOffset = '-5 minutes';
+
+	/**
+	 * The datetime offset after which we need to crawl again for a fast crawl.
+	 */
+	protected $dateTimeOffsetFast = '-1 minute';
 
 	/**
 	 * An array of ThemeAuthor entities indexed by their user_nicename.
@@ -66,6 +82,13 @@ class WpOrgApiCrawlService
 	protected $themeTags = [];
 
 	/**
+	 * An array of Theme entities indexed by their slug.
+	 *
+	 * @var Theme[]
+	 */
+	protected $themes = [];
+
+	/**
 	 * The constructor.
 	 */
 	public function __construct(
@@ -78,7 +101,10 @@ class WpOrgApiCrawlService
 		private MessageBusInterface $bus,
 	) {
 		$this->dateTimeOffset = $this->params->get('app.wp_crawl_time_offset');
+		$this->dateTimeOffsetFast = $this->params->get('app.wp_crawl_time_offset_fast');
+
 		$this->perPage = intval($this->params->get('app.wp_crawl_per_page'));
+		$this->perPageLarge = intval($this->params->get('app.wp_crawl_per_page_large'));
 	}
 
 	/**
@@ -128,6 +154,37 @@ class WpOrgApiCrawlService
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
+			'params' => $params,
+		]);
+
+		return $this->request($this->themeEndpoint, $params);
+	}
+
+	/**
+	 * Request theme stats from the WordPress.org API.
+	 * This method serves to fetch the more dynamic theme data from the API.
+	 *
+	 * @param int $page The page to request.
+	 *
+	 * @return array The themes from the API.
+	 */
+	public function requestThemeStats(int $page = 1): array
+	{
+		$params = [
+			'action' => 'query_themes',
+			'request[page]' => $page,
+			'request[per_page]' => $this->perPageLarge,
+			'request[fields][active_installs]' => 1,
+			'request[fields][num_ratings]' => 1,
+			'request[fields][rating]' => 1,
+			'request[fields][downloaded]' => 1,
+			'request[fields][description]' => 0,
+			'request[fields][homepage]' => 0,
+			'request[fields][template]' => 0,
+			'request[fields][screenshot_url]' => 0,
+		];
+
+		$this->logger->info('Requesting theme stats from WordPress.org API.', [
 			'params' => $params,
 		]);
 
@@ -210,7 +267,7 @@ class WpOrgApiCrawlService
 	 */
 	public function maybeCrawlThemeTags()
 	{
-				/**
+		/**
 		 * @var ThemeCrawlerStateOption $crawlState
 		 */
 		$crawlState = $this->optionsService->get('theme_tags_crawler_state');
@@ -241,6 +298,48 @@ class WpOrgApiCrawlService
 		 * Send the initial crawl of the first page to the messenger bus.
 		 */
 		$this->bus->dispatch(new ThemeTagsCrawl());
+	}
+
+	/**
+	 * Crawl and ingest the theme stats from the WordPress.org API.
+	 * This method does not have properties, as it handles the crawl state
+	 * with an option from the database.
+	 *
+	 * @return void
+	 */
+	public function maybeCrawlThemeStats()
+	{
+		/**
+		 * @var ThemeStatsCrawlerStateOption $crawlState
+		 */
+		$crawlState = $this->optionsService->get('theme_stats_crawler_state');
+
+		/**
+		 * A datetime in the past that we use to check if we need to crawl.
+		 *
+		 * @var \DateTimeInterface $crawlDateTimeOffset
+		 */
+		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffsetFast);
+
+		/**
+		 * Check if we actually need to crawl.
+		 * If the state is finished, but the datetime offset has been reached,
+		 * start a new crawl.
+		 */
+		if ($crawlState->getStartDateTime() < $crawlDateTimeOffset) {
+			$this->logger->info('Starting a new theme stats crawl.');
+			$crawlState->setStatus('running');
+			$crawlState->setStartDateTime(new \DateTimeImmutable());
+			$this->optionsService->set($crawlState);
+		} else {
+			$this->logger->info('Theme stats crawl already running.');
+			return null;
+		}
+
+		/**
+		 * Send the initial crawl of the first page to the messenger bus.
+		 */
+		$this->bus->dispatch(new ThemeStatsCrawl(1));
 	}
 
 	/**
@@ -376,9 +475,8 @@ class WpOrgApiCrawlService
 			foreach ($themeTagSlugs as $themeTagSlug) {
 				if (isset($this->themeTags[$themeTagSlug]) && $this->themeTags[$themeTagSlug] instanceof ThemeTag) {
 					$themeTag = $this->themeTags[$themeTagSlug];
+					$themeEntity->addTag($themeTag);
 				}
-
-				$themeEntity->addTag($themeTag);
 			}
 
 			unset($theme['tags']);
@@ -449,5 +547,72 @@ class WpOrgApiCrawlService
 		$themeTagEntity->setFromArray($tag);
 
 		$entityManager->persist($themeTagEntity);
+	}
+
+	/**
+	 * The method that ingests the theme stats from the WordPress.org API.
+	 *
+	 * @param array $apiThemes The theme stats from the API.
+	 *
+	 * @return void
+	 */
+	public function ingestStats(array $apiThemes)
+	{
+		if (!empty($apiThemes['themes'])) {
+			/**
+			 * Get a list of all the theme slugs.
+			 */
+			$themeSlugs = array_map(
+				static fn (array $theme): string => $theme['slug'],
+				$apiThemes['themes']
+			);
+
+			/**
+			 * @var ThemeRepository $themeRepository
+			 */
+			$themeRepository = $this->doctrine->getRepository(Theme::class);
+			$themeEntities = $themeRepository->findThemesBySlugs($themeSlugs);
+
+			$this->logger->info('Ingesting {count} theme stats.', [
+				'count' => count($themeEntities),
+			]);
+
+			$entityManager = $this->doctrine->getManager();
+
+			foreach ($apiThemes['themes'] as $apiTheme) {
+				if (isset($themeEntities[$apiTheme['slug']])) {
+					$themeEntity = $themeEntities[$apiTheme['slug']];
+					$this->ingestStatsForTheme($apiTheme, $themeEntity, $entityManager);
+				}
+			}
+
+			$entityManager->flush();
+			$entityManager->clear();
+		}
+	}
+
+	/**
+	 * Ingest the stats for a theme from the WordPress.org API into the database.
+	 *
+	 * @param array $theme The theme stats to ingest.
+	 * @param Theme $themeEntity The theme entity to ingest the stats for.
+	 * @param ObjectManager $entityManager The entity manager to use.
+	 *
+	 * @return void
+	 */
+	public function ingestStatsForTheme(array $theme, Theme $themeEntity, ObjectManager $entityManager): void
+	{
+		$statsEntity = new ThemeStatSnapshot();
+
+		$statsEntity->setTheme($themeEntity);
+		$statsEntity->setFromArray($theme);
+
+		/**
+		 * The freshness factor of the theme.
+		 */
+		$freshnessFactor = ($theme['active_installs'] / $theme['downloaded']) * $theme['active_installs'];
+		$statsEntity->setFreshness($freshnessFactor);
+
+		$entityManager->persist($statsEntity);
 	}
 }

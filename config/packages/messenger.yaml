@@ -21,6 +21,7 @@ framework:
             Symfony\Component\Notifier\Message\SmsMessage: async
             App\Message\ThemeInfoCrawl: async
             App\Message\ThemeTagsCrawl: async
+            App\Message\ThemeStatsCrawl: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async

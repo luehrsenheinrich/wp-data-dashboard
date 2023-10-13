@@ -56,7 +56,9 @@ class ThemeRepository extends ServiceEntityRepository
 	 * Find the newest themes for given theme slugs.
 	 * Returns an array of Theme entities indexed by their slug.
 	 *
-	 * @param array $themes An array of themes indexed by their slug.
+	 * @param array $themes An array of theme slugs.
+	 *
+	 * @return Theme[]
 	 */
 	public function findThemesBySlugs(array $slugs): array
 	{
