@@ -1,0 +1,138 @@
+name: 🚀 Create Release
+
+on:
+  # This action is triggered manually.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version number of this release. Runs `npm version`.'
+        required: true
+        default: 'patch'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_ADMIN_TOKEN }}
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: ⚙️ Configure git
+        run: |
+          git config user.name $GITHUB_ACTOR
+          git config user.email gh-actions-${GITHUB_ACTOR}@github.com
+
+      - name: ⚙️ Setup PHP with tools
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: 💾 Get node.js cache directory
+        id: node-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT # Use $(yarn cache dir) for yarn
+
+      - name: 💾 Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.node-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} # Use '**/yarn.lock' for yarn
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: 💾 Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: ⚙️ Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: ⚙️ Install Composer Packages
+        run: composer install --optimize-autoloader
+        env:
+          APP_ENV: dev
+
+      - name: ⚙️ Install Node Packages
+        run: npm ci
+
+      - name: ⚙️ Build the assets
+        run: npm run build
+
+      - name: ✍️ Create Changelog
+        shell: bash
+        id: changelog
+        run: |
+          log=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:'* %s (%h)')
+          log="${log//'%'/'%25'}"
+          log="${log//$'\n'/'%0A'}"
+          log="${log//$'\r'/'%0D'}"
+          echo "log=$log" >> $GITHUB_OUTPUT
+
+      - name: Check Status
+        run: git status
+
+      - name: 🔼 Bump version
+        run: npm version ${{ github.event.inputs.version }} -m 'Tagging %s'
+
+      - name: ⚙️ Get new version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Push the version to git
+        run: |
+            git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+
+      - name: 🚀 Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: |
+            ${{ steps.changelog.outputs.log }}
+          tag_name: v${{ steps.version.outputs.version }}
+
+      - name: 🚢 Deploy to Live Server
+        if: ${{ success() }}
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ${{ secrets.liveservFtpHost }}
+          username: ${{ secrets.liveservFtpUser }}
+          password: ${{ secrets.liveservFtpPassword }}
+          local-dir: ./
+          server-dir: ./public/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            var/**
+            .vscode/**
+            vendor/**
+
+      - name: 🖥 Perform migrations
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.liveservFtpHost }}
+          username: ${{ secrets.LIVESERVSSHUSER }}
+          password: ${{ secrets.LIVESERVSSHPASS }}
+          port: 22
+          script: |
+            source ~/.zshrc
+            cd public
+            composer install -n --optimize-autoloader
+            symfony console doctrine:cache:clear-metadata -n
+            symfony console doctrine:migrations:diff --allow-empty-diff -n
+            symfony console doctrine:migrations:migrate -n --allow-no-migration
+            symfony console cache:clear -n
