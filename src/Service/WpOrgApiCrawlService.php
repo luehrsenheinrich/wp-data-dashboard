@@ -59,6 +59,13 @@ class WpOrgApiCrawlService
 	protected $themeAuthors = [];
 
 	/**
+	 * An array of ThemeTag entities indexed by their slug.
+	 *
+	 * @var ThemeTag[]
+	 */
+	protected $themeTags = [];
+
+	/**
 	 * The constructor.
 	 */
 	public function __construct(
@@ -117,6 +124,7 @@ class WpOrgApiCrawlService
 			'request[fields][num_ratings]' => 0,
 			'request[fields][rating]' => 0,
 			'request[fields][extended_author]' => 1,
+			'request[fields][tags]' => 1,
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
@@ -262,6 +270,17 @@ class WpOrgApiCrawlService
 			);
 
 			/**
+			 * Get a list of all the theme tags.
+			 * The slug of the tags is the key of the array.
+			 */
+			$tagSlugs = [];
+			foreach ($apiThemes['themes'] as $theme) {
+				if (!empty($theme['tags'])) {
+					$tagSlugs = array_unique(array_merge($tagSlugs, array_keys($theme['tags'])));
+				}
+			}
+
+			/**
 			 * @var ThemeRepository $themeRepository
 			 */
 			$themeRepository = $this->doctrine->getRepository(Theme::class);
@@ -272,6 +291,12 @@ class WpOrgApiCrawlService
 			 */
 			$themeAuthorRepository = $this->doctrine->getRepository(ThemeAuthor::class);
 			$this->themeAuthors = $themeAuthorRepository->findByUserNicenames($nicenames);
+
+			/**
+			 * @var ThemeTagRepository $themeTagRepository
+			 */
+			$themeTagRepository = $this->doctrine->getRepository(ThemeTag::class);
+			$this->themeTags = $themeTagRepository->findBySlugs($tagSlugs);
 
 			$entityManager = $this->doctrine->getManager();
 
@@ -325,6 +350,9 @@ class WpOrgApiCrawlService
 			$themeEntity = new Theme();
 		}
 
+		/**
+		 * Handle the theme author.
+		 */
 		if (isset($this->themeAuthors[$theme['author']['user_nicename']]) && $this->themeAuthors[$theme['author']['user_nicename']] instanceof ThemeAuthor) {
 			$themeAuthor = $this->themeAuthors[$theme['author']['user_nicename']];
 		} else {
@@ -335,10 +363,32 @@ class WpOrgApiCrawlService
 		$themeAuthor->setFromArray($theme['author']);
 		unset($theme['author']);
 
+		/**
+		 * Handle the theme tags.
+		 */
+		if (!empty($theme['tags'])) {
+			// Clear the existing tags.
+			$themeEntity->removeTags();
+
+			//Get the theme tag slugs from the keys of the array.
+			$themeTagSlugs = array_keys($theme['tags']);
+
+			foreach ($themeTagSlugs as $themeTagSlug) {
+				if (isset($this->themeTags[$themeTagSlug]) && $this->themeTags[$themeTagSlug] instanceof ThemeTag) {
+					$themeTag = $this->themeTags[$themeTagSlug];
+				}
+
+				$themeEntity->addTag($themeTag);
+			}
+
+			unset($theme['tags']);
+		}
+
 		$themeEntity->setFromArray($theme);
 		$themeEntity->setAuthor($themeAuthor);
 
 		$entityManager->persist($themeEntity);
+		$entityManager->flush();
 	}
 
 	/**

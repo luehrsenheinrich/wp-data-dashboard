@@ -35,8 +35,8 @@ class HomeController extends AbstractController
 	public function crawlThemes(): Response
 	{
 
-		//$this->wpOrg->maybeCrawlThemeInfos();
 		$this->wpOrg->maybeCrawlThemeTags();
+		$this->wpOrg->maybeCrawlThemeInfos();
 
 		return $this->render(
 			'home/index.html.twig',

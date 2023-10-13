@@ -188,6 +188,13 @@ class Theme implements TimestampableInterface
 		return $this;
 	}
 
+	public function removeTags(): static
+	{
+		$this->tags->clear();
+
+		return $this;
+	}
+
 	public function getAuthor(): ?ThemeAuthor
 	{
 		if ($this->author === null) {

@@ -5,7 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.wp_crawl_time_offset: '%env(WP_CRAWL_TIME_OFFSET)%'
+    app.wp_crawl_time_offset_fast: '%env(WP_CRAWL_TIME_OFFSET_FAST)%'
     app.wp_crawl_per_page: '%env(WP_CRAWL_PER_PAGE)%'
+    app.wp_crawl_per_page_large: '%env(WP_CRAWL_PER_PAGE_LARGE)%'
 
 services:
     # default configuration for services in *this* file

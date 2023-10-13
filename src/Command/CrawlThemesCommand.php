@@ -24,6 +24,7 @@ class CrawlThemesCommand extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
+		$this->crawlService->maybeCrawlThemeTags();
 		$this->crawlService->maybeCrawlThemeInfos();
 		return Command::SUCCESS;
 	}
