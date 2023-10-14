@@ -26,5 +26,6 @@
         "lint": "npm run lint:js",
         "start": "composer install && npm install && npm run build && npm run serve",
         "version": "composer run update-version && git add -A"
-    }
+    },
+    "version": "0.0.1"
 }
