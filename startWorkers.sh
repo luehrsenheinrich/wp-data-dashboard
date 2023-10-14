@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # A script that stops all workers and restarts them
 # This bash script is called by a cron job every 5 minutes
 
