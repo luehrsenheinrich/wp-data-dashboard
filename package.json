@@ -27,5 +27,5 @@
         "start": "composer install && npm install && npm run build && npm run serve",
         "version": "composer run update-version && git add -A"
     },
-    "version": "0.0.7"
+    "version": "0.0.8"
 }
