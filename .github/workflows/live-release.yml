@@ -131,6 +131,7 @@ jobs:
           script: |
             source ~/.zshrc
             cd symfony
+            symfony console messenger:stop-workers
             composer install -n --optimize-autoloader
             symfony console doctrine:cache:clear-metadata -n
             symfony console doctrine:migrations:diff --allow-empty-diff -n
