@@ -26,6 +26,8 @@ class CrawlThemesCommand extends Command
 	{
 		$this->crawlService->maybeCrawlThemeTags();
 		$this->crawlService->maybeCrawlThemeInfos();
+		$this->crawlService->maybeCrawlThemeStats();
+
 		return Command::SUCCESS;
 	}
 }
