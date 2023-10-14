@@ -112,7 +112,7 @@ jobs:
           username: ${{ secrets.liveservFtpUser }}
           password: ${{ secrets.liveservFtpPassword }}
           local-dir: ./
-          server-dir: ./public/
+          server-dir: ./symfony/
           exclude: |
             **/.git*
             **/.git*/**
@@ -130,7 +130,7 @@ jobs:
           port: 22
           script: |
             source ~/.zshrc
-            cd public
+            cd symfony
             composer install -n --optimize-autoloader
             symfony console doctrine:cache:clear-metadata -n
             symfony console doctrine:migrations:diff --allow-empty-diff -n
