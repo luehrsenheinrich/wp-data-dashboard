@@ -1,16 +1,13 @@
 <div class="site-footer footer-wrapper border-top mt-4">
 	<div class="container">
-		<footer class="d-flex flex-wrap justify-content-between align-items-center py-3">
-			<div class="app-version text-muted flex-start">
-				v{{appVersion}}
+		<footer class="my-3">
+			{{navService.getFooterMenu|raw}}
+			<div class="credit text-center my-2 pt-3 border-top">
+				A <a href="https://www.luehrsen-heinrich.de">Luehrsen // Heinrich</a> project - <a href="https://www.luehrsen-heinrich.de/digital-first-agentur/wordpress-agentur-munchen/">WordPress Agency Munich</a>
 			</div>
-			<div class="credit">
-				A <a href="https://www.luehrsen-heinrich.de">Luehrsen // Heinrich</a> project - WordPress Agency Munich
+			<div class="app-version text-muted text-center my-2">
+				&copy; {{ 'now' | date('Y') }} - v{{appVersion}}
 			</div>
-			<ul class="footer-nav nav">
-				<li class="nav-item"><a href="https://www.luehrsen-heinrich.de/impressum/" class="nav-link">Impressum</a></li>
-				<li class="nav-item"><a href="https://www.luehrsen-heinrich.de/datenschutz/" class="nav-link">Datenschutz</a></li>
-			</ul>
 		</footer>
 	</div>
 </div>

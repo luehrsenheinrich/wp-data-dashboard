@@ -1,10 +1,11 @@
-<div class="site-header header-wrapper border-bottom mb-4">
-	<div class="container">
-		<header class="d-flex flex-wrap justify-content-center py-3">
-			<a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-			<span class="fs-4">WP Data Dashboard</span>
-			</a>
-			{{navService.getHeaderMenu|raw}}
-		</header>
-	</div>
-</div>
+<nav class="navbar navbar-expand-lg bg-light mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="{{path('app_home')}}">WP Data Dashboard</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+		{{navService.getHeaderMenu|raw}}
+    </div>
+  </div>
+</nav>
