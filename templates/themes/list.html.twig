@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+{% import 'themes/_theme-macros.html.twig' as themeMacros %}
+
+{% block title %}List WordPress Themes - Page {{pagination.current}}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Theme List</h1>
+            <ul class="list-group mb-4">
+                {% for theme in themes %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <a href="{{ path('app_themes_single', { slug: theme.slug })}}">{{ theme.name }}</a>
+                        <span class="text-muted">{{ theme.author.userNicename }}</span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">No themes found.</li>
+                {% endfor %}
+            </ul>
+			{{ themeMacros.pagination(pagination, 'app_themes_list_paginated')}}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

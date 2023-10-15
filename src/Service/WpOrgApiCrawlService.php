@@ -151,6 +151,8 @@ class WpOrgApiCrawlService
 			'request[fields][rating]' => 0,
 			'request[fields][extended_author]' => 1,
 			'request[fields][tags]' => 1,
+			'request[fields][theme_url]' => 1,
+			'request[fields][last_updated]' => 1,
 		];
 
 		$this->logger->info('Requesting themes from WordPress.org API.', [
@@ -481,6 +483,23 @@ class WpOrgApiCrawlService
 
 			unset($theme['tags']);
 		}
+
+		/**
+		 * Handle theme_url.
+		 */
+		if (isset($theme['theme_url']) && $theme['theme_url'] === false) {
+			$theme['theme_url'] = null;
+		}
+
+		/**
+		 * Handle last updated. (last_updated_time)
+		 */
+		if (isset($theme['last_updated_time'])) {
+			$themeEntity->setLastUpdated(new \DateTimeImmutable($theme['last_updated_time']));
+			unset($theme['last_updated_time']);
+			unset($theme['last_updated']);
+		}
+
 
 		$themeEntity->setFromArray($theme);
 		$themeEntity->setAuthor($themeAuthor);

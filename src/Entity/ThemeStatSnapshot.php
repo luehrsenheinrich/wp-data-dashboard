@@ -26,7 +26,7 @@ class ThemeStatSnapshot implements TimestampableInterface
 	#[ORM\Column]
 	private ?int $downloaded = null;
 
-	#[ORM\ManyToOne]
+	#[ORM\ManyToOne(inversedBy: 'themeStatSnapthots')]
 	#[ORM\JoinColumn(nullable: false)]
 	private ?Theme $theme = null;
 

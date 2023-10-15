@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
+use App\ControllerFilter\ThemeFilter;
 use App\Entity\Theme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\Traits\RepositoryFilterHelperTrait;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @extends ServiceEntityRepository<Theme>
@@ -16,6 +19,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ThemeRepository extends ServiceEntityRepository
 {
+	use RepositoryFilterHelperTrait;
+
 	public function __construct(ManagerRegistry $registry)
 	{
 		parent::__construct($registry, Theme::class);
@@ -77,5 +82,22 @@ class ThemeRepository extends ServiceEntityRepository
 		);
 
 		return $themesBySlug;
+	}
+
+	public function findAllWithFilter(ThemeFilter $filter): Paginator
+	{
+		$queryBuilder = $this->createQueryBuilder('t');
+
+		// When we do not have a sort, we want to sort by id descending
+		if (empty($filter->getSort())) {
+			$filter->setSort(['-id']);
+		}
+
+		$this->addSort($queryBuilder, $filter->getSort(), 't');
+
+		// Add the filter.
+		$this->addFilter($queryBuilder, 'name', $filter->getName(), 't');
+
+		return $this->createPaginator($queryBuilder, $filter->getPage(), $filter->getPerPage());
 	}
 }

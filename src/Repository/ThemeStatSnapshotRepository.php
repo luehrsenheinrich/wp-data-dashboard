@@ -16,10 +16,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ThemeStatSnapshotRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, ThemeStatSnapshot::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, ThemeStatSnapshot::class);
+	}
 
 	/**
 	 * Get the total number of theme stat snapshots.

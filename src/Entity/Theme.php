@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
-use App\Entity\EntityTraits\SlugTrait;
 use App\Repository\ThemeRepository;
+use App\Repository\ThemeStatSnapshotRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Service\Attribute\Required;
 
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
 class Theme implements TimestampableInterface
@@ -47,16 +48,23 @@ class Theme implements TimestampableInterface
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $themeUrl = null;
 
+	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+	private ?\DateTimeImmutable $lastUpdated = null;
+
 	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
 	private Collection $tags;
 
-	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'])]
+	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'], fetch: 'EAGER')]
 	#[ORM\JoinColumn(nullable: false)]
 	private ?ThemeAuthor $author = null;
+
+	#[ORM\OneToMany(mappedBy: 'theme', targetEntity: ThemeStatSnapshot::class)]
+	private Collection $themeStatSnapthots;
 
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
+		$this->themeStatSnapthots = new ArrayCollection();
 	}
 
 	/**
@@ -224,5 +232,25 @@ class Theme implements TimestampableInterface
 		$this->themeUrl = $themeUrl;
 
 		return $this;
+	}
+
+	public function getLastUpdated(): ?\DateTimeImmutable
+	{
+		return $this->lastUpdated;
+	}
+
+	public function setLastUpdated(\DateTimeImmutable $lastUpdated): static
+	{
+		$this->lastUpdated = $lastUpdated;
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection<int, ThemeStatSnapshot>
+	 */
+	public function getThemeStatSnapthots(): Collection
+	{
+		return $this->themeStatSnapthots;
 	}
 }
