@@ -7,15 +7,6 @@ cd "$(dirname "$0")"
 cd ..
 pwd
 
-# Check if the `symfony` command exists
-echo "==== Checking if the symfony command exists ===="
-if ! [ -x "$(command -v symfony)" ]; then
-	echo "====Error: symfony is not installed." >&2
-	exit 1
-else
-	echo "==== Symfony command exists ===="
-fi
-
 # Start the crawl
 echo "==== Starting the crawl ===="
-symfony console app:crawl:themes
+env -i /usr/bin/php82 -f ./bin/console app:crawl:themes
