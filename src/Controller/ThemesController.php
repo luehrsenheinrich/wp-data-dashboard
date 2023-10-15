@@ -37,7 +37,7 @@ class ThemesController extends AbstractController
 		}
 
 		return $this->render('themes/single.html.twig', [
-			'theme' => $this->themeRepository->getNewestTheme($slug),
+			'theme' => $this->themeRepository->getBySlug($slug),
 		]);
 	}
 }

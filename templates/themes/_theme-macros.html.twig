@@ -1,0 +1,16 @@
+{% macro theme_author(author) %}
+<div class="card border-0 shadow-sm p-1 mb-5 bg-light rounded">
+	<div class="card-body">
+		<div class="d-flex align-items-center">
+			<a href="{{ author.profile }}" target="_blank">
+				<img src="{{ author.avatar }}" alt="{{ author.displayName }} Avatar" class="rounded-circle me-3" width="48" height="48">
+			</a>
+			<div>
+				<strong>{{ author.displayName }}</strong><br>
+				<a href="{{ author.authorUrl }}" target="_blank">Website</a> |
+				<a href="{{ author.profile }}" target="_blank">WordPress Profile</a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endmacro %}

@@ -44,6 +44,9 @@ class Theme implements TimestampableInterface
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $template = null;
 
+	#[ORM\Column(length: 255, nullable: true)]
+	private ?string $themeUrl = null;
+
 	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
 	private Collection $tags;
 
@@ -207,6 +210,18 @@ class Theme implements TimestampableInterface
 	public function setAuthor(?ThemeAuthor $author): static
 	{
 		$this->author = $author;
+
+		return $this;
+	}
+
+	public function getThemeUrl(): ?string
+	{
+		return $this->themeUrl;
+	}
+
+	public function setThemeUrl(?string $themeUrl): static
+	{
+		$this->themeUrl = $themeUrl;
 
 		return $this;
 	}
