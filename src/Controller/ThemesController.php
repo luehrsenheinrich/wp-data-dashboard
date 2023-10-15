@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ThemeRepository;
+use App\Repository\ThemeStatSnapshotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,7 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class ThemesController extends AbstractController
 {
 	public function __construct(
-		private ThemeRepository $themeRepository
+		private ThemeRepository $themeRepository,
+		private ThemeStatSnapshotRepository $themeStatSnapshotRepository
 	) {
 	}
 
@@ -19,6 +21,7 @@ class ThemesController extends AbstractController
 	{
 		return $this->render('themes/index.html.twig', [
 			'total_themes' => $this->themeRepository->getTotalThemes(),
+			'total_theme_stat_snapshots' => $this->themeStatSnapshotRepository->getTotalCount(),
 		]);
 	}
 
