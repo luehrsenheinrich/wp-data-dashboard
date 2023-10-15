@@ -235,7 +235,7 @@ class WpOrgApiCrawlService
 		 *
 		 * @var \DateTimeInterface $crawlDateTimeOffset
 		 */
-		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffset);
+		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffsetFast);
 
 		/**
 		 * Check if we actually need to crawl.
@@ -277,7 +277,7 @@ class WpOrgApiCrawlService
 		 *
 		 * @var \DateTimeInterface $crawlDateTimeOffset
 		 */
-		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffset);
+		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffsetFast);
 
 		/**
 		 * Check if we actually need to crawl.
@@ -319,7 +319,7 @@ class WpOrgApiCrawlService
 		 *
 		 * @var \DateTimeInterface $crawlDateTimeOffset
 		 */
-		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffsetFast);
+		$crawlDateTimeOffset = new \DateTimeImmutable($this->dateTimeOffset);
 
 		/**
 		 * Check if we actually need to crawl.
