@@ -42,7 +42,7 @@ class ThemeRepository extends ServiceEntityRepository
 	 *
 	 * @return Theme|null
 	 */
-	public function getNewestTheme(string $slug): ?Theme
+	public function getBySlug(string $slug): ?Theme
 	{
 		return $this->createQueryBuilder('t')
 			->where('t.slug = :slug')

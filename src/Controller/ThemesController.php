@@ -22,11 +22,11 @@ class ThemesController extends AbstractController
 		]);
 	}
 
-	#[Route('/themes/{slug}', name: 'app_themes_single')]
+	#[Route('/themes/details/{slug}', name: 'app_themes_single', requirements: ['slug' => '[a-z0-9-]+'])]
 	public function single(string $slug): Response
 	{
 		// Retrieve the theme from the database.
-		$theme = $this->themeRepository->getNewestTheme($slug);
+		$theme = $this->themeRepository->getBySlug($slug);
 
 		// If the theme does not exist, return a 404 response.
 		if (!$theme) {
