@@ -1,7 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ThemesController!{% endblock %}
+{% block title %}Themes{% endblock %}
 
 {% block body %}
-<p>Tracking {{total_themes}} themes.</p>
+<div class="container">
+	<div class="row align-items-center border shadow-lg overflow-hidden">
+		<div class="col-lg-7 p-3 p-lg-5">
+			<h1 class="display-4 fw-bold lh-1">Explore the Landscape of WordPress Themes</h1>
+			<p class="lead">
+				Delve into the Themes Module to uncover trends and analyze performance metrics of various themes in the WordPress repository. We are currently tracking <b>{{total_themes}} themes</b> with <b>{{total_theme_stat_snapshots}} snapshots</b>.
+			</p>
+		</div>
+		<div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
+			<img class="img-fluid" src="/img/theme_library_hero.png" alt="An illustration of a theme library">
+		</div>
+	</div>
+</div>
 {% endblock %}

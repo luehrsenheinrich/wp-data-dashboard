@@ -1,0 +1,13 @@
+<div class="site-footer footer-wrapper border-top mt-4">
+	<div class="container">
+		<footer class="my-3">
+			{{navService.getFooterMenu|raw}}
+			<div class="credit text-center my-2 pt-3 border-top">
+				A <a href="https://www.luehrsen-heinrich.de">Luehrsen // Heinrich</a> project - <a href="https://www.luehrsen-heinrich.de/digital-first-agentur/wordpress-agentur-munchen/">WordPress Agency Munich</a>
+			</div>
+			<div class="app-version text-muted text-center my-2">
+				&copy; {{ 'now' | date('Y') }} - v{{appVersion}}
+			</div>
+		</footer>
+	</div>
+</div>

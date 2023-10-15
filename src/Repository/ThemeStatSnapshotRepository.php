@@ -21,6 +21,19 @@ class ThemeStatSnapshotRepository extends ServiceEntityRepository
         parent::__construct($registry, ThemeStatSnapshot::class);
     }
 
+	/**
+	 * Get the total number of theme stat snapshots.
+	 *
+	 * @return int
+	 */
+	public function getTotalCount(): int
+	{
+		return $this->createQueryBuilder('t')
+			->select('COUNT(t.id)')
+			->getQuery()
+			->getSingleScalarResult();
+	}
+
 //    /**
 //     * @return ThemeStatSnapshot[] Returns an array of ThemeStatSnapshot objects
 //     */
