@@ -608,10 +608,10 @@ class WpOrgApiCrawlService
 		$statsEntity->setFromArray($theme);
 
 		/**
-		 * The freshness factor of the theme.
+		 * The usage score of the theme.
 		 */
 		$freshnessFactor = ($theme['active_installs'] / $theme['downloaded']) * $theme['active_installs'];
-		$statsEntity->setFreshness($freshnessFactor);
+		$statsEntity->setUsageScore($freshnessFactor);
 
 		$entityManager->persist($statsEntity);
 	}

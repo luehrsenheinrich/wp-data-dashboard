@@ -6,11 +6,13 @@ use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
 use App\Repository\ThemeStatSnapshotRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
+use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 
 #[ORM\Entity(repositoryClass: ThemeStatSnapshotRepository::class)]
-class ThemeStatSnapshot
+class ThemeStatSnapshot implements TimestampableInterface
 {
-	use IdTrait, SetFromArrayTrait;
+	use IdTrait, SetFromArrayTrait, TimestampableTrait;
 
 	#[ORM\Column]
 	private ?float $rating = null;
@@ -29,7 +31,7 @@ class ThemeStatSnapshot
 	private ?Theme $theme = null;
 
 	#[ORM\Column]
-	private ?float $freshness = null;
+	private ?float $usageScore = null;
 
 	public function getId(): ?int
 	{
@@ -103,14 +105,14 @@ class ThemeStatSnapshot
 		return $this;
 	}
 
-	public function getFreshness(): ?float
+	public function getUsageScore(): ?float
 	{
-		return $this->freshness;
+		return $this->usageScore;
 	}
 
-	public function setFreshness(float $freshness): static
+	public function setUsageScore(float $usageScore): static
 	{
-		$this->freshness = $freshness;
+		$this->usageScore = $usageScore;
 
 		return $this;
 	}
