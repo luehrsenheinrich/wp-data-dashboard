@@ -146,9 +146,10 @@ class WpOrgApiCrawlService
 			'action' => 'query_themes',
 			'request[page]' => $page,
 			'request[per_page]' => $this->perPage,
-			'request[fields][active_installs]' => 0,
-			'request[fields][num_ratings]' => 0,
-			'request[fields][rating]' => 0,
+			'request[fields][active_installs]' => 1,
+			'request[fields][num_ratings]' => 1,
+			'request[fields][rating]' => 1,
+			'request[fields][downloaded]' => 1,
 			'request[fields][extended_author]' => 1,
 			'request[fields][tags]' => 1,
 			'request[fields][theme_url]' => 1,
@@ -500,6 +501,16 @@ class WpOrgApiCrawlService
 			unset($theme['last_updated']);
 		}
 
+		/**
+		 * The usage score of the theme.
+		 */
+		$themeEntity->setUsageScore(
+			$this->calculateUsageScore(
+				$theme['active_installs'],
+				$theme['downloaded']
+			)
+		);
+
 
 		$themeEntity->setFromArray($theme);
 		$themeEntity->setAuthor($themeAuthor);
@@ -629,9 +640,28 @@ class WpOrgApiCrawlService
 		/**
 		 * The usage score of the theme.
 		 */
-		$freshnessFactor = ($theme['active_installs'] / $theme['downloaded']) * $theme['active_installs'];
-		$statsEntity->setUsageScore($freshnessFactor);
+		$statsEntity->setUsageScore(
+			$this->calculateUsageScore(
+				$theme['active_installs'],
+				$theme['downloaded']
+			)
+		);
 
 		$entityManager->persist($statsEntity);
+	}
+
+	/**
+	 * Calculate the usage score for a theme.
+	 * The usage score is a number that represents the usage of a theme.
+	 *
+	 * @param Theme $theme The theme to calculate the usage score for.
+	 *
+	 * @return float The usage score.
+	 */
+	public function calculateUsageScore($activeInstalls, $downloaded): float
+	{
+		$usageScore = ($activeInstalls / $downloaded) * $activeInstalls;
+
+		return $usageScore;
 	}
 }

@@ -61,6 +61,21 @@ class Theme implements TimestampableInterface
 	#[ORM\OneToMany(mappedBy: 'theme', targetEntity: ThemeStatSnapshot::class)]
 	private Collection $themeStatSnapthots;
 
+	#[ORM\Column]
+	private ?int $rating = null;
+
+	#[ORM\Column]
+	private ?int $numRatings = null;
+
+	#[ORM\Column]
+	private ?int $activeInstalls = null;
+
+	#[ORM\Column]
+	private ?int $downloaded = null;
+
+	#[ORM\Column]
+	private ?float $usageScore = null;
+
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
@@ -252,5 +267,65 @@ class Theme implements TimestampableInterface
 	public function getThemeStatSnapthots(): Collection
 	{
 		return $this->themeStatSnapthots;
+	}
+
+	public function getRating(): ?int
+	{
+		return $this->rating;
+	}
+
+	public function setRating(int $rating): static
+	{
+		$this->rating = $rating;
+
+		return $this;
+	}
+
+	public function getNumRatings(): ?int
+	{
+		return $this->numRatings;
+	}
+
+	public function setNumRatings(int $numRatings): static
+	{
+		$this->numRatings = $numRatings;
+
+		return $this;
+	}
+
+	public function getActiveInstalls(): ?int
+	{
+		return $this->activeInstalls;
+	}
+
+	public function setActiveInstalls(int $activeInstalls): static
+	{
+		$this->activeInstalls = $activeInstalls;
+
+		return $this;
+	}
+
+	public function getDownloaded(): ?int
+	{
+		return $this->downloaded;
+	}
+
+	public function setDownloaded(int $downloaded): static
+	{
+		$this->downloaded = $downloaded;
+
+		return $this;
+	}
+
+	public function getUsageScore(): ?float
+	{
+		return $this->usageScore;
+	}
+
+	public function setUsageScore(float $usageScore): static
+	{
+		$this->usageScore = $usageScore;
+
+		return $this;
 	}
 }

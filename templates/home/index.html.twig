@@ -5,6 +5,7 @@
 {% block body %}
 
 <div class="container">
+    <!-- Hero Section -->
     <div class="row align-items-center border shadow-lg overflow-hidden">
         <div class="col-lg-7 p-3 p-lg-5">
             <h1 class="display-4 fw-bold lh-1">Unveil the Dynamics of WordPress Ecosystem</h1>
@@ -12,10 +13,30 @@
                 WP Data Dashboard is your centralized hub for exploring, analyzing, and visualizing data across the WordPress landscape. Venture into various modules and discover actionable insights from a wealth of data, curated from diverse sources within the WordPress ecosystem.
             </p>
             <a href="{{path('app_themes')}}" class="btn btn-primary mt-3">Explore Themes</a>
-
         </div>
         <div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
             <img class="img-fluid" src="/img/dashboard_hero.png" alt="An illustration of WP Data Dashboard">
+        </div>
+    </div>
+
+    <!-- What is WordPress Section -->
+    <div class="row my-5">
+        <div class="col-12">
+            <h2>What is WordPress?</h2>
+            <p>
+                WordPress is an open-source content management system (CMS) that empowers individuals and businesses to create, manage, and publish their content on the web. Known for its ease of use, extensibility, and a vast community of developers, WordPress is the platform behind millions of websites ranging from personal blogs to enterprise-grade eCommerce sites and digital publications.
+            </p>
+        </div>
+    </div>
+
+    <!-- Themes Module Explanation Section -->
+    <div class="row my-5">
+        <div class="col-12">
+            <h2>Explore the Themes Module</h2>
+            <p>
+                The Themes Module within WP Data Dashboard serves as a gateway to understanding the diverse landscape of WordPress themes. It provides meticulously curated data regarding various themes available in the WordPress repository, shedding light on their performance, authorship, and trends over time. By diving into this module, you unlock a treasure trove of insights that can help you make informed decisions whether you are a theme developer, website builder, or a curious observer.
+            </p>
+            <a href="{{path('app_themes')}}" class="btn btn-primary mt-3">Dive into Themes Module</a>
         </div>
     </div>
 </div>
