@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% import 'themes/_theme-macros.html.twig' as themeMacros %}
+
+{% block title %}List WordPress Themes - Page {{pagination.current}}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">{{ themeTag.name }}</h1>
+			{{ themeMacros.themes_table(themes) }}
+			<div class="d-flex justify-content-center">
+				{{ themeMacros.pagination(pagination, 'app_themes_tag', {themeTagSlug: themeTag.slug})}}
+			</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

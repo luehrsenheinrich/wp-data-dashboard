@@ -23,9 +23,9 @@ class NavigationService
 	private $request;
 
 	public function __construct(
-        protected RequestStack $requestStack,
+		protected RequestStack $requestStack,
 		protected UrlGeneratorInterface $router,
-	){
+	) {
 	}
 
 	/**
@@ -144,7 +144,6 @@ class NavigationService
 		$html .= '<ul class="'.$navClasses.'">';
 
 		foreach ($menu as $item) {
-
 			// If the route is set, we use the route.
 			if (isset($item['route']) && $item['route']) {
 				$item['url'] = $this->router->generate($item['route']);
@@ -175,4 +174,69 @@ class NavigationService
 		return $html;
 	}
 
+	/**
+	 * Generate a range for which we display page numbers.
+	 *
+	 * @param  int $current The current page.
+	 * @param  int $last    The maximum numbers of pages.
+	 * @param  int $delta   The width of the pagination range.
+	 *
+	 * @return array The pagination range.
+	 */
+	public function generatePaginationRange($current, $last, $delta = 1)
+	{
+		/**
+		 * Define some constants.
+		 */
+		$current 	     = intval($current);
+		$left            = intval($current - $delta);
+		$right           = intval($current + $delta);
+		$last            = intval($last);
+		$range           = array();
+		$rangeWithDots   = array();
+
+		for ($i = 1; $i <= $last; $i++) {
+			if ($i === 1 || $i === $last || ($i >= $left && $i <= $right)) {
+				$range[] = $i;
+			}
+		}
+
+		$l = null;
+		foreach ($range as $i) {
+			if ($i === $last || $i === 1) {
+				$delta = false;
+			} else {
+				$delta = abs($i - $current);
+			}
+
+			if ($l) {
+				if ($i - $l === 2) {
+					$rangeWithDots[] = array(
+						'page_number' => $l + 1,
+						'current'     => $l === $current,
+						'dots'        => false,
+						'delta'       => $delta,
+					);
+				} elseif ($i - $l !== 1) {
+					$rangeWithDots[] = array(
+						'page_number' => null,
+						'current'     => false,
+						'dots'        => true,
+						'delta'       => 0,
+					);
+				}
+			}
+
+			$rangeWithDots[] = array(
+				'page_number' => $i,
+				'current'     => $i === $current,
+				'dots'        => false,
+				'delta'       => $delta,
+			);
+
+			$l = $i;
+		}
+
+		return $rangeWithDots;
+	}
 }

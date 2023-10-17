@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
-use App\Entity\EntityTraits\SlugTrait;
 use App\Repository\ThemeRepository;
+use App\Repository\ThemeStatSnapshotRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Service\Attribute\Required;
 
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
 class Theme implements TimestampableInterface
@@ -44,16 +45,44 @@ class Theme implements TimestampableInterface
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $template = null;
 
+	#[ORM\Column(length: 255, nullable: true)]
+	private ?string $themeUrl = null;
+
+	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+	private ?\DateTimeImmutable $lastUpdated = null;
+
 	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
 	private Collection $tags;
 
-	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'])]
+	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'], fetch: 'EAGER')]
 	#[ORM\JoinColumn(nullable: false)]
 	private ?ThemeAuthor $author = null;
+
+	#[ORM\OneToMany(mappedBy: 'theme', targetEntity: ThemeStatSnapshot::class)]
+	private Collection $themeStatSnapthots;
+
+	#[ORM\Column]
+	private ?int $rating = null;
+
+	#[ORM\Column]
+	private ?int $numRatings = null;
+
+	#[ORM\Column]
+	private ?int $activeInstalls = null;
+
+	#[ORM\Column]
+	private ?int $downloaded = null;
+
+	#[ORM\Column]
+	private ?float $usageScore = null;
+
+	#[ORM\OneToOne(targetEntity: self::class, fetch: 'EAGER')]
+	private ?self $parent = null;
 
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
+		$this->themeStatSnapthots = new ArrayCollection();
 	}
 
 	/**
@@ -207,6 +236,110 @@ class Theme implements TimestampableInterface
 	public function setAuthor(?ThemeAuthor $author): static
 	{
 		$this->author = $author;
+
+		return $this;
+	}
+
+	public function getThemeUrl(): ?string
+	{
+		return $this->themeUrl;
+	}
+
+	public function setThemeUrl(?string $themeUrl): static
+	{
+		$this->themeUrl = $themeUrl;
+
+		return $this;
+	}
+
+	public function getLastUpdated(): ?\DateTimeImmutable
+	{
+		return $this->lastUpdated;
+	}
+
+	public function setLastUpdated(\DateTimeImmutable $lastUpdated): static
+	{
+		$this->lastUpdated = $lastUpdated;
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection<int, ThemeStatSnapshot>
+	 */
+	public function getThemeStatSnapthots(): Collection
+	{
+		return $this->themeStatSnapthots;
+	}
+
+	public function getRating(): ?int
+	{
+		return $this->rating;
+	}
+
+	public function setRating(int $rating): static
+	{
+		$this->rating = $rating;
+
+		return $this;
+	}
+
+	public function getNumRatings(): ?int
+	{
+		return $this->numRatings;
+	}
+
+	public function setNumRatings(int $numRatings): static
+	{
+		$this->numRatings = $numRatings;
+
+		return $this;
+	}
+
+	public function getActiveInstalls(): ?int
+	{
+		return $this->activeInstalls;
+	}
+
+	public function setActiveInstalls(int $activeInstalls): static
+	{
+		$this->activeInstalls = $activeInstalls;
+
+		return $this;
+	}
+
+	public function getDownloaded(): ?int
+	{
+		return $this->downloaded;
+	}
+
+	public function setDownloaded(int $downloaded): static
+	{
+		$this->downloaded = $downloaded;
+
+		return $this;
+	}
+
+	public function getUsageScore(): ?float
+	{
+		return $this->usageScore;
+	}
+
+	public function setUsageScore(float $usageScore): static
+	{
+		$this->usageScore = $usageScore;
+
+		return $this;
+	}
+
+	public function getParent(): ?self
+	{
+		return $this->parent;
+	}
+
+	public function setParent(?self $parent): static
+	{
+		$this->parent = $parent;
 
 		return $this;
 	}
