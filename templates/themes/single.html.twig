@@ -5,43 +5,40 @@
 
 {% block body %}
 <div class="container my-5">
-	<div class="row">
-		<div class="col-md-8 mb-4">
-            <h1>{{ theme.name }}</h1>
-			<span class="text-muted h4">by {{theme.author.displayName}} </span>
+	<div class="row border-bottom mb-3 pb-3">
+		<div class="col-md-6">
+            <h1 class="my-0">{{ theme.name }}</h1>
 		</div>
-		<div class="col-md-4 mb-4 d-flex  align-items-center justify-content-end">
+		<div class="col-md-6 d-flex align-items-end justify-content-end">
+			<span class="text-muted h4 my-0">by {{theme.author.displayName}} </span>
+		</div>
+	</div>
+	<div class="row mb-5">
+		<div class="col-md-6 d-flex align-items-start">
+			{% if theme.parent %}
+				<span class="text-muted h6 my-0">a child theme of <a href="{{path( 'app_themes_single', {slug: theme.parent.slug})}}">{{theme.parent.name}}</a></span>
+			{% endif %}
+		</div>
+		<div class="col-md-6 d-flex align-items-start justify-content-end">
 			<div class="btn-group">
-				<a href="{{ theme.homepage }}" class="btn btn-outline-primary" target="_blank">Homepage</a>
-				<a href="{{ theme.homepage }}" class="btn btn-outline-primary" target="_blank">WP.org</a>
-				<a href="{{ theme.previewUrl }}" class="btn btn-outline-primary" target="_blank">Preview</a>
+				{% if theme.themeUrl %}
+					<a href="{{ theme.themeUrl }}" class="btn btn-outline-primary btn-sm" target="_blank">Homepage</a>
+				{% endif %}
+				<a href="{{ theme.homepage }}" class="btn btn-outline-primary btn-sm" target="_blank">WP.org</a>
+				<a href="{{ theme.previewUrl }}" class="btn btn-outline-primary btn-sm" target="_blank">Preview</a>
 			</div>
 		</div>
 	</div>
     <div class="row">
         <div class="col-md-6">
             <p>{{ theme.description | raw}}</p>
-            <ul class="list-group list-group-flush mb-4">
-                {% if theme.previewUrl %}
-                    <li class="list-group-item">
-                        <strong>Theme Preview:</strong> <a href="{{ theme.previewUrl }}" target="_blank">View</a>
-                    </li>
-                {% endif %}
-                {% if theme.template %}
-                    <li class="list-group-item">
-                        <strong>Parent Theme:</strong> {{ theme.template }}
-                    </li>
-                {% endif %}
-                {% if theme.tags %}
-                    <li class="list-group-item">
-                        {% for tag in theme.tags %}
-                            <a href="/tags/{{ tag.slug }}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
-                        {% endfor %}
-                    </li>
-                {% endif %}
-            </ul>
+			{% if theme.tags %}
+				{% for tag in theme.tags %}
+					<a href="{{ path('app_themes_tag', {themeTagSlug: tag.slug})}}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
+				{% endfor %}
+			{% endif %}
 		</div>
-        <div class="col-md-6">
+        <div class="col-md-6 col-lg-5 offset-lg-1">
             <img src="{{ theme.screenshotUrl }}" alt="{{ theme.name }} Screenshot" class="img-fluid mb-4 shadow-sm">
 			{{ themeMacros.theme_author(theme.author) }}
         </div>

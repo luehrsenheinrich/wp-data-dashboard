@@ -364,6 +364,17 @@ class WpOrgApiCrawlService
 			);
 
 			/**
+			 * Get a list of all template slugs.
+			 * We do this to check if a theme is a child theme and if so,
+			 * we can set the parent theme. We have to check if the template
+			 * key is set, because not all themes have a parent theme.
+			 */
+			$themeSlugs = array_unique(array_merge($themeSlugs, array_map(
+				static fn (array $theme): string => $theme['template'],
+				array_filter($apiThemes['themes'], static fn (array $theme): bool => isset($theme['template']))
+			)));
+
+			/**
 			 * Get a list of all the theme author nicenames.
 			 */
 			$nicenames = array_map(
@@ -386,7 +397,7 @@ class WpOrgApiCrawlService
 			 * @var ThemeRepository $themeRepository
 			 */
 			$themeRepository = $this->doctrine->getRepository(Theme::class);
-			$themeEntities = $themeRepository->findThemesBySlugs($themeSlugs);
+			$this->themes = $themeRepository->findThemesBySlugs($themeSlugs);
 
 			/**
 			 * @var ThemeAuthorRepository $themeAuthorRepository
@@ -403,8 +414,8 @@ class WpOrgApiCrawlService
 			$entityManager = $this->doctrine->getManager();
 
 			foreach ($apiThemes['themes'] as $apiTheme) {
-				if (isset($themeEntities[$apiTheme['slug']])) {
-					$themeEntity = $themeEntities[$apiTheme['slug']];
+				if (isset($this->themes[$apiTheme['slug']])) {
+					$themeEntity = $this->themes[$apiTheme['slug']];
 				} else {
 					$themeEntity = null;
 				}
@@ -511,6 +522,14 @@ class WpOrgApiCrawlService
 			)
 		);
 
+		/**
+		 * The parent theme.
+		 */
+		if (isset($theme['template']) && isset($this->themes[$theme['template']])) {
+			$themeEntity->setParent($this->themes[$theme['template']]);
+		} else {
+			$themeEntity->setParent(null);
+		}
 
 		$themeEntity->setFromArray($theme);
 		$themeEntity->setAuthor($themeAuthor);
@@ -660,6 +679,11 @@ class WpOrgApiCrawlService
 	 */
 	public function calculateUsageScore($activeInstalls, $downloaded): float
 	{
+		// Prevent divide by zero errors.
+		if ($downloaded === 0) {
+			return 0;
+		}
+
 		$usageScore = ($activeInstalls / $downloaded) * $activeInstalls;
 
 		return $usageScore;

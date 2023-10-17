@@ -76,6 +76,9 @@ class Theme implements TimestampableInterface
 	#[ORM\Column]
 	private ?float $usageScore = null;
 
+	#[ORM\OneToOne(targetEntity: self::class, fetch: 'EAGER')]
+	private ?self $parent = null;
+
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
@@ -325,6 +328,18 @@ class Theme implements TimestampableInterface
 	public function setUsageScore(float $usageScore): static
 	{
 		$this->usageScore = $usageScore;
+
+		return $this;
+	}
+
+	public function getParent(): ?self
+	{
+		return $this->parent;
+	}
+
+	public function setParent(?self $parent): static
+	{
+		$this->parent = $parent;
 
 		return $this;
 	}
