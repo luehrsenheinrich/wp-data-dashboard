@@ -165,6 +165,38 @@ class ThemeRepository extends ServiceEntityRepository
 	}
 
 	/**
+	 * Get diversity score for authors.
+	 *
+	 * @return array
+	 */
+	public function getAuthorDiversityScore(): array
+	{
+		// Fetch total downloads for each author.
+		$results = $this->createQueryBuilder('t')
+			->select('IDENTITY(t.author) as authorId, SUM(t.downloaded) as totalDownloads')
+			->groupBy('t.author')
+			->getQuery()
+			->getResult();
+
+		$totalDownloads = array_sum(array_column($results, 'totalDownloads'));
+
+		$diversityScore = 0;
+		foreach ($results as $result) {
+			$proportion = $result['totalDownloads'] / $totalDownloads;
+			$diversityScore -= $proportion * log($proportion);
+		}
+
+		// Compute the highest possible diversity score.
+		$numberOfAuthors = count($results);
+		$maxDiversityScore = log($numberOfAuthors);
+
+		return [
+			'score' => $diversityScore,
+			'max' => $maxDiversityScore
+		];
+	}
+
+	/**
 	 * Get the current average rating for themes that have atleast one rating.
 	 *
 	 * @return array

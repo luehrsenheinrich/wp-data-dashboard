@@ -670,22 +670,55 @@ class WpOrgApiCrawlService
 	}
 
 	/**
-	 * Calculate the usage score for a theme.
-	 * The usage score is a number that represents the usage of a theme.
+	 * Calculates the usage score based on a logarithmic transformation of active installs and total downloads.
 	 *
-	 * @param Theme $theme The theme to calculate the usage score for.
+	 * @param int $activeInstalls The number of active installs.
+	 * @param int $downloaded The number of total downloads.
 	 *
 	 * @return float The usage score.
 	 */
 	public function calculateUsageScore($activeInstalls, $downloaded): float
 	{
-		// Prevent divide by zero errors.
-		if ($downloaded === 0) {
+		if ($activeInstalls === 0) {
 			return 0;
 		}
 
-		$usageScore = ($activeInstalls / $downloaded) * $activeInstalls;
+		/**
+		 * The weight of the active installs.
+		 */
+		$w1 = 2;
 
-		return $usageScore;
+		/**
+		 * The weight of the total downloads.
+		 */
+		$w2 = 1;
+
+		/**
+		 * Active install threshold.
+		 * If the active installs are equal or over this threshold,
+		 * the ratio will be 1.
+		 */
+		$activeInstallThreshold = 1000000;
+
+		/**
+		 * The ratio of active installs to total downloads.
+		 * This is used to estimate the user retention.
+		 */
+		$ratio = ($downloaded > 0) ? $activeInstalls / $downloaded : 0;
+
+		if ($activeInstalls >= $activeInstallThreshold) {
+			$ratio = 1;
+		}
+
+		$logarithmicScore = $w1 * log(1 + $activeInstalls) / $w2 * log(1 + $downloaded);
+
+		// Parameters for the sigmoid function.
+		$k = 20; // Steepness of the transition.
+		$x0 = 0.05; // Midpoint of the transition. Adjust to control where the decay begins.
+
+		// Sigmoid adjustment for the ratio.
+		$adjustment = 1 / (1 + exp(-$k * ($ratio - $x0)));
+
+		return $adjustment * $logarithmicScore;
 	}
 }

@@ -25,11 +25,13 @@ class ThemesController extends AbstractController
 	public function index(): Response
 	{
 		$themeStats = $this->themeRepository->getCurrentStats();
+		$themeAuthorDiversityScore = $this->themeRepository->getAuthorDiversityScore();
 
 		return $this->render('themes/index.html.twig', [
 			'total_theme_stat_snapshots' => $this->themeStatSnapshotRepository->getTotalCount(),
 			'stats' => $themeStats,
 			'ratings' => $this->themeRepository->getCurrentAverageRating(),
+			'diversity' => $themeAuthorDiversityScore,
 		]);
 	}
 

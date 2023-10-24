@@ -71,7 +71,7 @@
 					<div class="card-body">
 						<h3 class="h2 card-title">{{stats.totalAuthors|number_format}}</h3>
 						<h4 class="card-title">Total Authors</h4>
-						<p class="card-text">that published themes</p>
+						<p class="card-text">that published {{stats.totalThemes}} themes</p>
 					</div>
 				</div>
 			</div>
@@ -81,6 +81,15 @@
 						<h3 class="h2 card-title">{{stats.averageInstalls|number_format}}</h3>
 						<h4 class="card-title">Average Installs</h4>
 						<p class="card-text">per theme</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 mb-4">
+				<div class="card text-center border bg-white shadow-sm">
+					<div class="card-body">
+						<h3 class="h2 card-title">{{((diversity.score/diversity.max)*100)|number_format(0)}} %</h3>
+						<h4 class="card-title">Diversity Score</h4>
+						<p class="card-text">comparing overall downloads and authors</p>
 					</div>
 				</div>
 			</div>

@@ -31,12 +31,42 @@
 	</div>
     <div class="row">
         <div class="col-md-6">
-            <p>{{ theme.description | raw}}</p>
+
+            <p class="mx-2">{{ theme.description | raw}}</p>
+
 			{% if theme.tags %}
+			<hr>
+			<h2 class="h6 mx-2">Tags</h2>
 				{% for tag in theme.tags %}
-					<a href="{{ path('app_themes_tag', {themeTagSlug: tag.slug})}}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
+					<a href="{{ path('app_themes_tag', {themeTagSlug: tag.slug})}}" class="btn btn-primary btn-sm m-1">{{ tag.name }}</a>
 				{% endfor %}
 			{% endif %}
+			<ul class="list-group my-4">
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Version</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.version }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Last updated</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.lastUpdated|date("m/d/Y") }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Active Installations</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.activeInstalls|number_format }}+</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Total Downloads</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.downloaded|number_format }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Usage Score</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.usageScore|number_format }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<span class="text-muted"><strong>Last seen</strong></span>
+					<span class="badge bg-secondary rounded-pill">{{ theme.updatedAt|date("m/d/Y") }}</span>
+				</li>
+			</ul>
 		</div>
         <div class="col-md-6 col-lg-5 offset-lg-1">
             <img src="{{ theme.screenshotUrl }}" alt="{{ theme.name }} Screenshot" class="img-fluid mb-4 shadow-sm">

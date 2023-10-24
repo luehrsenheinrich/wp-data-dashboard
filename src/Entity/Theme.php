@@ -76,7 +76,7 @@ class Theme implements TimestampableInterface
 	#[ORM\Column]
 	private ?float $usageScore = null;
 
-	#[ORM\OneToOne(targetEntity: self::class, fetch: 'EAGER')]
+	#[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
 	private ?self $parent = null;
 
 	public function __construct()
