@@ -66,3 +66,20 @@
 	</table>
 </div>
 {% endmacro %}
+
+{% macro stat_card(stat) %}
+<div class="col-md-4 mb-4">
+	<div class="card text-center border shadow-sm">
+		<div class="card-body">
+			<h3 class="h2 card-title">
+				{{stat.title}}
+				{% if stat.badge is defined %}
+					<span class="badge d-block bg-info rounded-pill fs-6 align-top fw-bold position-absolute top-0 end-0 mt-n2 me-n2">{{stat.badge}}</span>
+				{% endif %}
+			</h3>
+			<h4 class="card-title">{{stat.subtitle}}</h4>
+			<p class="card-text">{{stat.text}}</p>
+		</div>
+	</div>
+</div>
+{% endmacro %}

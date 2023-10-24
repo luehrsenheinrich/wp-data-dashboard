@@ -78,6 +78,24 @@ class ThemesController extends AbstractController
 		]);
 	}
 
+	#[Route('/themes/stats/', name: 'app_themes_stats')]
+	public function stats(): Response
+	{
+		return $this->render('themes/stats.html.twig', [
+			'all' => [
+				'stats' => $this->themeRepository->getCurrentStats(),
+				'ratings' => $this->themeRepository->getCurrentAverageRating(),
+				'diversity' => $this->themeRepository->getAuthorDiversityScore(),
+			],
+			'woDefault' => [
+				'stats' => $this->themeRepository->getCurrentStats(['wordpressdotorg']),
+				'ratings' => $this->themeRepository->getCurrentAverageRating(['wordpressdotorg']),
+				'diversity' => $this->themeRepository->getAuthorDiversityScore(['wordpressdotorg']),
+			]
+		]);
+	}
+
+
 	#[Route('/themes/tag/{themeTagSlug}/{page}', name: 'app_themes_tag', requirements: ['themeTagSlug' => '[a-z0-9-]+', 'page' => '\d+'])]
 	public function tag(string $themeTagSlug, int $page = 1): Response
 	{

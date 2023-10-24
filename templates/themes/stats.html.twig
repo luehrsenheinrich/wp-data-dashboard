@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+{% import 'themes/_theme-macros.html.twig' as themeMacros %}
+
+{% block title %} WordPress Themes Stats {% endblock %}
+
+{% block body %}
+<div class="container my-5">
+	<div class="row border-bottom mb-3 pb-3">
+		<div class="col-md-6">
+            <h1 class="my-0">Stats</h1>
+		</div>
+		<div class="col-md-6 d-flex align-items-end justify-content-end">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 d-flex align-items-start">
+			of all WordPress themes in the official repository.
+		</div>
+		<div class="col-md-6 d-flex align-items-start justify-content-end">
+			<div class="btn-group">
+				<a href="{{ path('app_themes_list') }}" class="btn btn-outline-primary btn-sm">List</a>
+				<a href="{{ path('app_themes') }}" class="btn btn-outline-primary btn-sm">Back</a>
+			</div>
+		</div>
+	</div>
+	<section class="my-5">
+		<div class="row">
+		    <div class="col-lg-6 offset-lg-3">
+        		<h2 class="mb-3">The complete Theme Ecosystem in Numbers</h2>
+			</div>
+		</div>
+		<div class="row">
+			{{themeMacros.stat_card({
+				'title': all.stats.downloaded|number_format,
+				'subtitle': 'Downloads',
+				'text': 'tracked across all ' ~ all.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': all.stats.activeInstalls|number_format,
+				'subtitle': 'Active Installs',
+				'text': 'estimated across all ' ~ all.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': all.ratings.averageRating|number_format ~ ' %',
+				'subtitle': 'Average Rating',
+				'text': 'calculated across ' ~ all.ratings.totalThemes ~ ' themes with ' ~ all.ratings.totalRatings ~ ' reviews',
+			})}}
+		</div>
+		<div class="row">
+			{{themeMacros.stat_card({
+				'title': all.stats.totalAuthors|number_format,
+				'subtitle': 'Total Authors',
+				'text': 'that published ' ~ all.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': all.stats.averageInstalls|number_format,
+				'subtitle': 'Average Installs',
+				'text': 'per theme',
+			})}}
+			{{themeMacros.stat_card({
+				'title': ((all.diversity.score/all.diversity.max)*100)|number_format(0) ~ ' %',
+				'subtitle': 'Diversity Score',
+				'text': 'comparing overall downloads and authors',
+			})}}
+		</div>
+	</section>
+	<section class="my-5">
+		<div class="row">
+		    <div class="col-lg-6 offset-lg-3">
+        		<h2 class="mb-3">Without Default Themes</h2>
+			</div>
+		</div>
+		<div class="row">
+			{{themeMacros.stat_card({
+				'title': woDefault.stats.downloaded|number_format,
+				'badge': ((woDefault.stats.downloaded/all.stats.downloaded)*100)|number_format ~ '%',
+				'subtitle': 'Downloads',
+				'text': 'tracked across ' ~ woDefault.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': woDefault.stats.activeInstalls|number_format,
+				'badge': ((woDefault.stats.activeInstalls/all.stats.activeInstalls)*100)|number_format ~ '%',
+				'subtitle': 'Active Installs',
+				'text': 'estimated across ' ~ woDefault.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': woDefault.ratings.averageRating|number_format ~ ' %',
+				'subtitle': 'Average Rating',
+				'text': 'calculated across ' ~ woDefault.ratings.totalThemes ~ ' themes with ' ~ woDefault.ratings.totalRatings ~ ' reviews',
+			})}}
+		</div>
+		<div class="row">
+			{{themeMacros.stat_card({
+				'title': woDefault.stats.totalAuthors|number_format,
+				'subtitle': 'Total Authors',
+				'text': 'that published ' ~ woDefault.stats.totalThemes ~ ' themes',
+			})}}
+			{{themeMacros.stat_card({
+				'title': woDefault.stats.averageInstalls|number_format,
+				'badge': ((woDefault.stats.averageInstalls/all.stats.averageInstalls)*100)|number_format ~ '%',
+				'subtitle': 'Average Installs',
+				'text': 'per theme',
+			})}}
+			{{themeMacros.stat_card({
+				'title': ((woDefault.diversity.score/woDefault.diversity.max)*100)|number_format(0) ~ ' %',
+				'subtitle': 'Diversity Score',
+				'text': 'comparing overall downloads and authors',
+			})}}
+		</div>
+	</section>
+</div>
+{% endblock %}

@@ -141,19 +141,29 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Get current theme stats.
 	 *
+	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 *
 	 * @return array
 	 */
-	public function getCurrentStats(): array
+	public function getCurrentStats($ignoredAuthors = array()): array
 	{
-		$stats = $this->createQueryBuilder('t')
+		$query = $this->createQueryBuilder('t')
 			->select('
 				SUM(t.activeInstalls) as activeInstalls,
 				SUM(t.downloaded) as downloaded,
 				COUNT(t.id) as totalThemes,
 				COUNT(DISTINCT t.author) as totalAuthors,
-				AVG(t.activeInstalls) as averageInstalls')
-			->getQuery()
-			->getResult();
+				AVG(t.activeInstalls) as averageInstalls');
+
+		if (!empty($ignoredAuthors)) {
+			// Join the author entity so we can filter on the userNicename.
+			$query->join('t.author', 'a')
+				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
+				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+		$stats = $query->getQuery()
+						->getResult();
 
 		return [
 			'activeInstalls' => (int) $stats[0]['activeInstalls'],
@@ -167,15 +177,25 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Get diversity score for authors.
 	 *
+	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 *
 	 * @return array
 	 */
-	public function getAuthorDiversityScore(): array
+	public function getAuthorDiversityScore($ignoredAuthors = array()): array
 	{
 		// Fetch total downloads for each author.
-		$results = $this->createQueryBuilder('t')
+		$query = $this->createQueryBuilder('t')
 			->select('IDENTITY(t.author) as authorId, SUM(t.downloaded) as totalDownloads')
-			->groupBy('t.author')
-			->getQuery()
+			->groupBy('t.author');
+
+		if (!empty($ignoredAuthors)) {
+			// Join the author entity so we can filter on the userNicename.
+			$query->join('t.author', 'a')
+				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
+				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+		$results = $query->getQuery()
 			->getResult();
 
 		$totalDownloads = array_sum(array_column($results, 'totalDownloads'));
@@ -197,7 +217,7 @@ class ThemeRepository extends ServiceEntityRepository
 	}
 
 	/**
-	 * Get the current average rating for themes that have atleast one rating.
+	 * Get the current average rating for themes that have at least one rating.
 	 *
 	 * @return array
 	 */
