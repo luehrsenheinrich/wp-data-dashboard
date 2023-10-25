@@ -124,4 +124,29 @@ class ThemesController extends AbstractController
 			'pagination' => $pagination,
 		]);
 	}
+
+	#[Route('/themes/{themeTagSlug}/stats/', name: 'app_themes_tag_stats', requirements: ['themeTagSlug' => '[a-z0-9-]+'])]
+	public function tagStats(string $themeTagSlug): Response
+	{
+		$themeTag = $this->themeTagRepository->findOneBy(['slug' => $themeTagSlug]);
+
+		return $this->render('themes/tagStats.html.twig', [
+			'themeTag' => $themeTag,
+			'all' => [
+				'stats' => $this->themeRepository->getCurrentStats(),
+				'ratings' => $this->themeRepository->getCurrentAverageRating(),
+				'diversity' => $this->themeRepository->getAuthorDiversityScore(),
+			],
+			'tag' => [
+				'stats' => $this->themeRepository->getCurrentStats(array(), array($themeTag)),
+				'ratings' => $this->themeRepository->getCurrentAverageRating(array(), array($themeTag)),
+				'diversity' => $this->themeRepository->getAuthorDiversityScore(array(), array($themeTag)),
+			],
+			'woDefault' => [
+				'stats' => $this->themeRepository->getCurrentStats(['wordpressdotorg'], array($themeTag)),
+				'ratings' => $this->themeRepository->getCurrentAverageRating(['wordpressdotorg'], array($themeTag)),
+				'diversity' => $this->themeRepository->getAuthorDiversityScore(['wordpressdotorg'], array($themeTag)),
+			]
+		]);
+	}
 }
