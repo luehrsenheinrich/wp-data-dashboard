@@ -36,35 +36,44 @@
 				'badge': ((tag.stats.downloaded/all.stats.downloaded)*100)|number_format ~ '%',
 				'subtitle': 'Downloads',
 				'text': 'tracked across all ' ~ tag.stats.totalThemes ~ ' themes',
+				'badgeColor': 'secondary',
 			})}}
 			{{themeMacros.stat_card({
 				'title': tag.stats.activeInstalls|number_format,
 				'badge': ((tag.stats.activeInstalls/all.stats.activeInstalls)*100)|number_format ~ '%',
 				'subtitle': 'Active Installs',
 				'text': 'estimated across all ' ~ tag.stats.totalThemes ~ ' themes',
+				'badgeColor': 'secondary',
 			})}}
 			{{themeMacros.stat_card({
 				'title': tag.ratings.averageRating|number_format ~ ' %',
+				'badge': ((tag.ratings.averageRating-all.ratings.averageRating > 0) ? '+' : '') ~ (tag.ratings.averageRating-all.ratings.averageRating)|number_format ~ '%',
 				'subtitle': 'Average Rating',
 				'text': 'calculated across ' ~ tag.ratings.totalThemes ~ ' themes with ' ~ tag.ratings.totalRatings ~ ' reviews',
+				'badgeColor': 'secondary',
 			})}}
 		</div>
 		<div class="row">
 			{{themeMacros.stat_card({
 				'title': tag.stats.totalAuthors|number_format,
+				'badge': ((tag.stats.totalAuthors/all.stats.totalAuthors)*100)|number_format ~ '%',
 				'subtitle': 'Total Authors',
 				'text': 'that published ' ~ tag.stats.totalThemes ~ ' themes',
+				'badgeColor': 'secondary',
 			})}}
 			{{themeMacros.stat_card({
 				'title': tag.stats.averageInstalls|number_format,
 				'badge': ((tag.stats.averageInstalls/all.stats.averageInstalls)*100)|number_format ~ '%',
 				'subtitle': 'Average Installs',
 				'text': 'per theme',
+				'badgeColor': 'secondary',
 			})}}
 			{{themeMacros.stat_card({
-				'title': ((tag.diversity.score/tag.diversity.max)*100)|number_format(0) ~ ' %',
+				'title': (tag.diversity.perc)|number_format(0) ~ ' %',
+				'badge': ((tag.diversity.perc-all.diversity.perc > 0) ? '+' : '') ~ (tag.diversity.perc-all.diversity.perc)|number_format ~ '%',
 				'subtitle': 'Diversity Score',
 				'text': 'comparing overall downloads and authors',
+				'badgeColor': 'secondary',
 			})}}
 		</div>
 	</section>
@@ -89,8 +98,10 @@
 				'subtitle': 'Active Installs',
 				'text': 'estimated across ' ~ woDefault.stats.totalThemes ~ ' themes',
 			})}}
+			{% set badgeValue = (woDefault.ratings.averageRating-all.ratings.averageRating) %}
 			{{themeMacros.stat_card({
 				'title': woDefault.ratings.averageRating|number_format ~ ' %',
+				'badge': ((woDefault.ratings.averageRating-all.ratings.averageRating > 0) ? '+' : '') ~ (woDefault.ratings.averageRating-all.ratings.averageRating)|number_format ~ '%',
 				'subtitle': 'Average Rating',
 				'text': 'calculated across ' ~ woDefault.ratings.totalThemes ~ ' themes with ' ~ woDefault.ratings.totalRatings ~ ' reviews',
 			})}}
@@ -98,6 +109,7 @@
 		<div class="row">
 			{{themeMacros.stat_card({
 				'title': woDefault.stats.totalAuthors|number_format,
+				'badge': ((woDefault.stats.totalAuthors/all.stats.totalAuthors)*100)|number_format ~ '%',
 				'subtitle': 'Total Authors',
 				'text': 'that published ' ~ woDefault.stats.totalThemes ~ ' themes',
 			})}}
@@ -108,7 +120,8 @@
 				'text': 'per theme',
 			})}}
 			{{themeMacros.stat_card({
-				'title': ((woDefault.diversity.score/woDefault.diversity.max)*100)|number_format(0) ~ ' %',
+				'title': (woDefault.diversity.perc)|number_format(0) ~ ' %',
+				'badge': ((woDefault.diversity.perc-all.diversity.perc > 0) ? '+' : '') ~ (woDefault.diversity.perc-all.diversity.perc)|number_format ~ '%',
 				'subtitle': 'Diversity Score',
 				'text': 'comparing overall downloads and authors',
 			})}}

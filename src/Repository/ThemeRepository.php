@@ -141,11 +141,12 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Get current theme stats.
 	 *
-	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 * @param string[]   $ignoredAuthors The userNicename of authors to ignore.
+	 * @param ThemeTag[] $filteredByTags The tags to filter by.
 	 *
 	 * @return array
 	 */
-	public function getCurrentStats($ignoredAuthors = array()): array
+	public function getCurrentStats($ignoredAuthors = array(), $filteredByTags = array()): array
 	{
 		$query = $this->createQueryBuilder('t')
 			->select('
@@ -160,6 +161,13 @@ class ThemeRepository extends ServiceEntityRepository
 			$query->join('t.author', 'a')
 				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
 				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+		if (!empty($filteredByTags)) {
+			// Join the tags entity so we can filter on the tags.
+			$query->join('t.tags', 'tt')
+				->andWhere('tt IN (:filteredByTags)')
+				->setParameter('filteredByTags', $filteredByTags);
 		}
 
 		$stats = $query->getQuery()
@@ -177,11 +185,12 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Get diversity score for authors.
 	 *
-	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 * @param string[]   $ignoredAuthors The userNicename of authors to ignore.
+	 * @param ThemeTag[] $filteredByTags The tags to filter by.
 	 *
 	 * @return array
 	 */
-	public function getAuthorDiversityScore($ignoredAuthors = array()): array
+	public function getAuthorDiversityScore($ignoredAuthors = array(), $filteredByTags = array()): array
 	{
 		// Fetch total downloads for each author.
 		$query = $this->createQueryBuilder('t')
@@ -193,6 +202,14 @@ class ThemeRepository extends ServiceEntityRepository
 			$query->join('t.author', 'a')
 				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
 				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+
+		if (!empty($filteredByTags)) {
+			// Join the tags entity so we can filter on the tags.
+			$query->join('t.tags', 'tt')
+				->andWhere('tt IN (:filteredByTags)')
+				->setParameter('filteredByTags', $filteredByTags);
 		}
 
 		$results = $query->getQuery()
@@ -212,18 +229,20 @@ class ThemeRepository extends ServiceEntityRepository
 
 		return [
 			'score' => $diversityScore,
-			'max' => $maxDiversityScore
+			'max' => $maxDiversityScore,
+			'perc' => $diversityScore / $maxDiversityScore * 100,
 		];
 	}
 
 	/**
 	 * Get the current average rating for themes that have at least one rating.
 	 *
-	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 * @param string[]   $ignoredAuthors The userNicename of authors to ignore.
+	 * @param ThemeTag[] $filteredByTags The tags to filter by.
 	 *
 	 * @return array
 	 */
-	public function getCurrentAverageRating($ignoredAuthors = array()): array
+	public function getCurrentAverageRating($ignoredAuthors = array(), $filteredByTags = array()): array
 	{
 		$query = $this->createQueryBuilder('t')
 			->select('AVG(t.rating) as averageRating, COUNT(t.id) as totalThemes, SUM(t.numRatings) as totalRatings')
@@ -234,6 +253,13 @@ class ThemeRepository extends ServiceEntityRepository
 			$query->join('t.author', 'a')
 				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
 				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+		if (!empty($filteredByTags)) {
+			// Join the tags entity so we can filter on the tags.
+			$query->join('t.tags', 'tt')
+				->andWhere('tt IN (:filteredByTags)')
+				->setParameter('filteredByTags', $filteredByTags);
 		}
 
 		$averageRating = $query->getQuery()

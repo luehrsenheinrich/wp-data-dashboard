@@ -68,6 +68,8 @@
 		<div class="row">
 		    <div class="col-lg-6 offset-lg-3">
         		<h2 class="mb-3">Without Default Themes</h2>
+				<p>These stats ignore so called "default themes", that are being downloaded by default with every WordPress installation. Examples are "Twenty Twenty-Two" or "Twenty Twenty-One".</p>
+				<p>The badge indicates the difference compared to all WordPress Themes in the official repository.</p>
 			</div>
 		</div>
 		<div class="row">
@@ -83,8 +85,10 @@
 				'subtitle': 'Active Installs',
 				'text': 'estimated across ' ~ woDefault.stats.totalThemes ~ ' themes',
 			})}}
+			{% set badgeValue = (woDefault.ratings.averageRating-all.ratings.averageRating) %}
 			{{themeMacros.stat_card({
 				'title': woDefault.ratings.averageRating|number_format ~ ' %',
+				'badge': ((woDefault.ratings.averageRating-all.ratings.averageRating > 0) ? '+' : '') ~ (woDefault.ratings.averageRating-all.ratings.averageRating)|number_format ~ '%',
 				'subtitle': 'Average Rating',
 				'text': 'calculated across ' ~ woDefault.ratings.totalThemes ~ ' themes with ' ~ woDefault.ratings.totalRatings ~ ' reviews',
 			})}}
@@ -102,7 +106,8 @@
 				'text': 'per theme',
 			})}}
 			{{themeMacros.stat_card({
-				'title': ((woDefault.diversity.score/woDefault.diversity.max)*100)|number_format(0) ~ ' %',
+				'title': (woDefault.diversity.perc)|number_format(0) ~ ' %',
+				'badge': ((woDefault.diversity.perc-all.diversity.perc > 0) ? '+' : '') ~ (woDefault.diversity.perc-all.diversity.perc)|number_format ~ '%',
 				'subtitle': 'Diversity Score',
 				'text': 'comparing overall downloads and authors',
 			})}}
