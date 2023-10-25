@@ -11,7 +11,8 @@
             <p class="lead">
                 Delve into the Themes Module to uncover trends and analyze performance metrics of various themes in the WordPress repository. We are currently tracking <b>{{stats.totalThemes}} themes</b> with <b>{{total_theme_stat_snapshots}} snapshots</b>.
             </p>
-			<a href="{{path('app_themes_list')}}" class="btn btn-primary mt-3">List Themes</a>
+			<a href="{{path('app_themes_list')}}" class="btn btn-primary mt-3">List</a>
+			<a href="{{path('app_themes_stats')}}" class="btn btn-primary mt-3">Stats</a>
 
         </div>
         <div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
@@ -19,12 +20,46 @@
         </div>
     </div>
 
-    <!-- What is a WordPress Theme? Section -->
     <section>
         <div class="row">
             <div class="col-lg-6 offset-lg-3 my-2 my-lg-5">
         		<h2 class="mb-3">Understanding WordPress Themes</h2>
             	<p>A WordPress theme is the essence of your website's visual identity. It crafts the layout, design, colors, and typography. With themes, WordPress offers versatility, allowing your site to be unique and tailored to your content.</p>
+			</div>
+		</div>
+    </section>
+
+    <section class="my-2 my-lg-5">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+        		<h2 class="mb-3">Frequently Asked Questions</h2>
+			</div>
+			<div class="col-lg-6 offset-lg-3">
+				<div class="accordion" id="themeFaqAccordion">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingOne">
+							<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+								What is the Usage Score?
+							</button>
+						</h2>
+						<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#themeFaqAccordion">
+							<div class="accordion-body">
+								The <strong>Usage Score</strong> represents the effectiveness of a theme based on its active installs and total downloads. A high score indicates a theme that not only has been downloaded frequently but also remains actively installed on many sites. The score undergoes a significant decay if the proportion of active installs to downloads is low, indicating that while the theme might be frequently downloaded, it's not retained by users. This metric provides insight into both the initial appeal of a theme and its lasting utility to users.							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingTwo">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+								What is the Diversity Score?
+							</button>
+						</h2>
+						<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#themeFaqAccordion">
+							<div class="accordion-body">
+								The <strong>Diversity Score</strong> quantifies the distribution of theme downloads among different authors on a scale from 0% to 100%. A high score indicates that downloads are spread across many authors, suggesting a diverse and competitive marketplace. On the other hand, a low score suggests that a few authors dominate the downloads, indicating less diversity. This metric provides insight into the variety of theme offerings and the balance of power in the theme marketplace.
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
     </section>

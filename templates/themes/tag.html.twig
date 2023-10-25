@@ -1,16 +1,36 @@
 {% extends 'base.html.twig' %}
 {% import 'themes/_theme-macros.html.twig' as themeMacros %}
 
-{% block title %}List WordPress Themes - Page {{pagination.current}}{% endblock %}
+{% block title %}Tag: {{themeTag.name}} - WordPress Themes - Page {{pagination.current}}{% endblock %}
 
 {% block body %}
 <div class="container my-5">
+	<div class="row border-bottom mb-3 pb-3">
+		<div class="col-md-6">
+            <h1 class="my-0">{{themeTag.name}} - List</h1>
+		</div>
+		<div class="col-md-6 d-flex align-items-end justify-content-end">
+		{% if pagination.current > 1 %}
+				<span class="text-muted h4 my-0"><small class="">Page {{pagination.current}}</small></span>
+		{% endif %}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 d-flex align-items-start">
+			of all WordPress Themes tagged with {{themeTag.name}}.
+		</div>
+		<div class="col-md-6 d-flex align-items-start justify-content-end">
+			<div class="btn-group">
+				<a href="{{ path('app_themes_stats') }}" class="btn btn-outline-primary btn-sm">Stats</a>
+				<a href="{{ path('app_themes') }}" class="btn btn-outline-primary btn-sm">Back</a>
+			</div>
+		</div>
+	</div>
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4">{{ themeTag.name }}</h1>
 			{{ themeMacros.themes_table(themes) }}
 			<div class="d-flex justify-content-center">
-				{{ themeMacros.pagination(pagination, 'app_themes_tag', {themeTagSlug: themeTag.slug})}}
+				{{ themeMacros.pagination(pagination, 'app_themes_tag', {'themeTagSlug': themeTag.slug})}}
 			</div>
         </div>
     </div>

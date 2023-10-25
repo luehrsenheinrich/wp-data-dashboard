@@ -219,15 +219,25 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Get the current average rating for themes that have at least one rating.
 	 *
+	 * @param string[] $ignoredAuthors The userNicename of authors to ignore.
+	 *
 	 * @return array
 	 */
-	public function getCurrentAverageRating(): array
+	public function getCurrentAverageRating($ignoredAuthors = array()): array
 	{
-		$averageRating = $this->createQueryBuilder('t')
+		$query = $this->createQueryBuilder('t')
 			->select('AVG(t.rating) as averageRating, COUNT(t.id) as totalThemes, SUM(t.numRatings) as totalRatings')
-			->where('t.numRatings > 0')
-			->getQuery()
-			->getOneOrNullResult();
+			->where('t.numRatings > 0');
+
+		if (!empty($ignoredAuthors)) {
+			// Join the author entity so we can filter on the userNicename.
+			$query->join('t.author', 'a')
+				->andWhere('a.userNicename NOT IN (:ignoredAuthors)')
+				->setParameter('ignoredAuthors', $ignoredAuthors);
+		}
+
+		$averageRating = $query->getQuery()
+					->getOneOrNullResult();
 
 		return [
 			'averageRating' => (float) $averageRating['averageRating'],
