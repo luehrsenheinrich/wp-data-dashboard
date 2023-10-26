@@ -149,4 +149,12 @@ class ThemesController extends AbstractController
 			]
 		]);
 	}
+
+	#[Route('/themes/tags/', name: 'app_themes_tags')]
+	public function tags(): Response
+	{
+		return $this->render('themes/tags.html.twig', [
+			'tags' => $this->themeTagRepository->findAll(),
+		]);
+	}
 }
