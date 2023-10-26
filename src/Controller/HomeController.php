@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Theme;
 use App\Entity\ThemeAuthor;
+use App\Service\PageMetaService;
 use App\Service\WpOrgApiCrawlService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,32 +18,20 @@ class HomeController extends AbstractController
 		private HttpClientInterface $client,
 		private ManagerRegistry $doctrine,
 		private WpOrgApiCrawlService $wpOrg,
+		private PageMetaService $pageMetaService,
 	) {
 	}
 
 	#[Route('/', name: 'app_home')]
 	public function index(): Response
 	{
+
+		$this->pageMetaService->addTitlePart('Unveil the Dynamics of WordPress Ecosystem');
+
 		return $this->render(
 			'home/index.html.twig',
 			[
 				'controller_name' => 'HomeController',
-			]
-		);
-	}
-
-	#[Route('crawl_themes', name: 'app_crawl_themes')]
-	public function crawlThemes(): Response
-	{
-
-		$this->wpOrg->maybeCrawlThemeTags();
-		$this->wpOrg->maybeCrawlThemeInfos();
-		$this->wpOrg->maybeCrawlThemeStats();
-
-		return $this->render(
-			'home/index.html.twig',
-			[
-				'controller_name' => 'CrawlThemesController',
 			]
 		);
 	}

@@ -7,6 +7,7 @@ use App\Repository\ThemeRepository;
 use App\Repository\ThemeStatSnapshotRepository;
 use App\Repository\ThemeTagRepository;
 use App\Service\NavigationService;
+use App\Service\PageMetaService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,6 +19,7 @@ class ThemesController extends AbstractController
 		private ThemeStatSnapshotRepository $themeStatSnapshotRepository,
 		private ThemeTagRepository $themeTagRepository,
 		private NavigationService $navigationService,
+		private PageMetaService $pageMetaService,
 	) {
 	}
 
@@ -26,6 +28,8 @@ class ThemesController extends AbstractController
 	{
 		$themeStats = $this->themeRepository->getCurrentStats();
 		$themeAuthorDiversityScore = $this->themeRepository->getAuthorDiversityScore();
+
+		$this->pageMetaService->addTitlePart('WordPress Themes');
 
 		return $this->render('themes/index.html.twig', [
 			'total_theme_stat_snapshots' => $this->themeStatSnapshotRepository->getTotalCount(),
@@ -46,7 +50,8 @@ class ThemesController extends AbstractController
 			throw $this->createNotFoundException();
 		}
 
-		$theme->getThemeStatSnapthots()->last();
+		$this->pageMetaService->addTitlePart($theme->getName());
+		$this->pageMetaService->addTitlePart('WordPress Theme');
 
 		return $this->render('themes/single.html.twig', [
 			'theme' => $this->themeRepository->getBySlug($slug),
@@ -62,6 +67,12 @@ class ThemesController extends AbstractController
 		$filter->setSort(['-usage_score']);
 
 		$themes = $this->themeRepository->findAllWithFilter($filter);
+
+		$this->pageMetaService->addTitlePart('WordPress Themes');
+
+		if ($page > 1) {
+			$this->pageMetaService->addTitlePart('Page '.$page);
+		}
 
 		$pagination = array(
 			'current' => (int) $filter->getPage(),
@@ -81,6 +92,9 @@ class ThemesController extends AbstractController
 	#[Route('/themes/stats/', name: 'app_themes_stats')]
 	public function stats(): Response
 	{
+
+		$this->pageMetaService->addTitlePart('WordPress Theme Statistics');
+
 		return $this->render('themes/stats.html.twig', [
 			'all' => [
 				'stats' => $this->themeRepository->getCurrentStats(),
@@ -112,6 +126,13 @@ class ThemesController extends AbstractController
 
 		$themes = $this->themeRepository->findAllWithFilterByTag($filter, $themeTag);
 
+		$this->pageMetaService->addTitlePart($themeTag->getName());
+		$this->pageMetaService->addTitlePart('WordPress Themes');
+
+		if ($page > 1) {
+			$this->pageMetaService->addTitlePart('Page '.$page);
+		}
+
 		$pagination = array(
 			'current' => (int) $filter->getPage(),
 			'total' => (int) ceil($themes->count() / $filter->getPerPage()),
@@ -129,6 +150,9 @@ class ThemesController extends AbstractController
 	public function tagStats(string $themeTagSlug): Response
 	{
 		$themeTag = $this->themeTagRepository->findOneBy(['slug' => $themeTagSlug]);
+
+		$this->pageMetaService->addTitlePart($themeTag->getName());
+		$this->pageMetaService->addTitlePart('WordPress Theme Statistics');
 
 		return $this->render('themes/tagStats.html.twig', [
 			'themeTag' => $themeTag,
@@ -153,6 +177,8 @@ class ThemesController extends AbstractController
 	#[Route('/themes/tags/', name: 'app_themes_tags')]
 	public function tags(): Response
 	{
+		$this->pageMetaService->addTitlePart('WordPress Theme Tags');
+
 		return $this->render('themes/tags.html.twig', [
 			'tags' => $this->themeTagRepository->findAll(),
 		]);

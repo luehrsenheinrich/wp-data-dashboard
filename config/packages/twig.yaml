@@ -3,6 +3,7 @@ twig:
     globals:
         appVersion: '%app.version%'
         navService: '@App\Service\NavigationService'
+        pageMetaService: '@App\Service\PageMetaService'
 
 when@test:
     twig:
