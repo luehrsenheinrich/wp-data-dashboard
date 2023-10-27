@@ -53,6 +53,11 @@ class ThemesController extends AbstractController
 		$this->pageMetaService->addTitlePart($theme->getName());
 		$this->pageMetaService->addTitlePart('WordPress Theme');
 
+		$this->pageMetaService->setDescription(
+			'Information and stats about the WordPress Theme '.$theme->getName().'. '.
+			$theme->getDescription()
+		);
+
 		return $this->render('themes/single.html.twig', [
 			'theme' => $this->themeRepository->getBySlug($slug),
 		]);

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Twig\Environment;
 
@@ -37,10 +38,18 @@ class PageMetaService
 	private string $titleSeparator = ' - ';
 
 	/**
+	 * The description.
+	 *
+	 * @var ?string
+	 */
+	private ?string $description = null;
+
+	/**
 	 * The constructor.
 	 */
 	public function __construct(
 		private Environment $twig,
+		private UrlGeneratorInterface $router,
 	) {
 	}
 
@@ -69,6 +78,72 @@ class PageMetaService
 	}
 
 	/**
+	 * Get the short page title.
+	 *
+	 * @return string
+	 */
+	public function getShortTitle(): string
+	{
+		return implode($this->titleSeparator, $this->titleParts);
+	}
+
+	/**
+	 * Set the site name.
+	 *
+	 * @return self
+	 */
+	public function setSiteName(string $siteName): self
+	{
+		$this->siteName = $siteName;
+
+		return $this;
+	}
+
+	/**
+	 * Get the site name.
+	 *
+	 * @return string
+	 */
+	public function getSiteName(): string
+	{
+		return $this->siteName;
+	}
+
+	/**
+	 * Set the title separator.
+	 *
+	 * @return self
+	 */
+	public function setTitleSeparator(string $titleSeparator): self
+	{
+		$this->titleSeparator = $titleSeparator;
+
+		return $this;
+	}
+
+	/**
+	 * Set the description.
+	 *
+	 * @return self
+	 */
+	public function setDescription(?string $description): self
+	{
+		$this->description = $description;
+
+		return $this;
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return ?string
+	 */
+	public function getDescription(): ?string
+	{
+		return $this->description;
+	}
+
+	/**
 	 * Get the page meta tags.
 	 *
 	 * @return string The html meta tags for the page header.
@@ -79,6 +154,8 @@ class PageMetaService
 			'pageMeta.html.twig',
 			[
 				'title' => $this->getTitle(),
+				'shortTitle' => $this->getShortTitle(),
+				'description' => $this->getDescription(),
 			]
 		);
 	}
