@@ -151,7 +151,7 @@ class ThemesController extends AbstractController
 		]);
 	}
 
-	#[Route('/themes/{themeTagSlug}/stats/', name: 'app_themes_tag_stats', requirements: ['themeTagSlug' => '[a-z0-9-]+'])]
+	#[Route('/themes/tag/{themeTagSlug}/stats/', name: 'app_themes_tag_stats', requirements: ['themeTagSlug' => '[a-z0-9-]+'])]
 	public function tagStats(string $themeTagSlug): Response
 	{
 		$themeTag = $this->themeTagRepository->findOneBy(['slug' => $themeTagSlug]);
