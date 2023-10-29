@@ -8,7 +8,7 @@ parameters:
     app.wp_crawl_time_offset_fast: '%env(WP_CRAWL_TIME_OFFSET_FAST)%'
     app.wp_crawl_per_page: '%env(WP_CRAWL_PER_PAGE)%'
     app.wp_crawl_per_page_large: '%env(WP_CRAWL_PER_PAGE_LARGE)%'
-    app.version: '0.1.2'
+    app.version: '0.1.3'
 
 services:
     # default configuration for services in *this* file
