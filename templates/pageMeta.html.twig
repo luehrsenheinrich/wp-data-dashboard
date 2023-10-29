@@ -1,4 +1,5 @@
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 <title>{{title}}</title>
 <meta name="description" content="{{description|u.truncate(156, ' ...')}}">
@@ -7,4 +8,5 @@
 <meta property="og:title" content="{{shortTitle}}">
 <meta property="og:url" content="{{absolute_url(path(app.current_route, app.current_route_parameters))}}">
 <meta property="og:description" content="{{description|u.truncate(156, ' ...')}}">
+<meta property="og:type" content="{{ is defined type ? type : 'website' }}">
 
