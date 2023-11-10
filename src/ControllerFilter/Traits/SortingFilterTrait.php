@@ -17,7 +17,16 @@ trait SortingFilterTrait
 	 */
 	#[Serializer\Type("array<string>")]
 	#[Serializer\Groups(["read"])]
-	#[OA\Property(description: 'The fields to sort by.', example: ['name', '-id'])]
+	#[OA\Property(
+		type: "array",
+		property: "sort[]",
+		description: "The fields to sort by in an array format. Use 'sort[]' for each field in the query string. Prefix with '-' for descending order. Example: ?sort[]=name&sort[]=-id",
+		example: ["name","-id"],
+		items: new OA\Items(
+			type: "string",
+			example: "sort[]=name",
+		),
+	)]
 	protected $sort = [];
 
 	public function getSort()
