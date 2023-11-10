@@ -19,6 +19,7 @@ use FOS\RestBundle\View\View;
 use JMS\Serializer\Serializer;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 
 #[OA\Tag(name:"Themes")]
 #[Rest\Route("/themes")]
@@ -60,8 +61,9 @@ class ThemesController extends AbstractLHRestController
 			)
 		)
 	)]
-	public function getThemesAction(ThemeFilter $filter): View
-	{
+	public function getThemesAction(
+		#[MapQueryString] ThemeFilter $filter = new ThemeFilter()
+	): View {
 		/**
 		 * Query the database for the Themes.
 		 *
@@ -91,5 +93,62 @@ class ThemesController extends AbstractLHRestController
 		 * Return the View.
 		 */
 		return View::create($dtos, Response::HTTP_OK, $headers);
+	}
+
+	/**
+	 * Get a single theme.
+	 *
+	 * @param string $slug The theme slug.
+	 *
+	 * @return View
+	 */
+	#[REST\Get('/{slug}', name: 'api_themes_get_single')]
+	#[REST\View(serializerGroups: ['read', 'read:theme'])]
+	#[OA\Parameter(
+		in: 'path',
+		name: 'slug',
+		description: 'The theme slug.',
+		required: true,
+		schema: new OA\Schema(
+			type: 'string',
+			example: 'twenty-twenty-two',
+		),
+	)]
+	#[OA\Response(
+		response: 200,
+		description: "The theme.",
+		content:  new OA\JsonContent(
+			ref: new Model(
+				type: ThemeDto::class,
+			)
+		)
+	)]
+	public function getThemeAction(string $slug): View
+	{
+		/**
+		 * Query the database for the Theme.
+		 *
+		 * @var Theme|null $theme
+		 */
+		$theme = $this->themeRepository->getBySlug($slug);
+
+		/**
+		 * If the theme does not exist, return a 404 response.
+		 */
+		if (!$theme) {
+			throw $this->createNotFoundException();
+		}
+
+		/**
+		 * Transform the entity into a DTO.
+		 *
+		 * @var ThemeDto $dto
+		 */
+		$dto = $this->themeDtoTransformer->transformFromObject($theme);
+
+		/**
+		 * Return the View.
+		 */
+		return View::create($dto, Response::HTTP_OK);
 	}
 }

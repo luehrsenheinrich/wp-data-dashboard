@@ -15,7 +15,7 @@ class ThemeFilter extends AbstractFilter
 	use PaginationFilterTrait, SortingFilterTrait;
 
 	/**
-	 * @var string
+	 * @var ?string
 	 */
 	#[Assert\Length(min:3, max:128)]
 	#[OA\Property(description: 'The theme name.', example: 'Twenty Twenty-Two')]
@@ -26,7 +26,7 @@ class ThemeFilter extends AbstractFilter
 	/**
 	 * Get the value of name
 	 *
-	 * @return  string
+	 * @return  ?string
 	 */
 	public function getName()
 	{

@@ -88,13 +88,17 @@ class ThemeRepository extends ServiceEntityRepository
 	/**
 	 * Find all themes with a given filter.
 	 *
-	 * @param ThemeFilter $filter The filter.
+	 * @param ?ThemeFilter $filter The filter.
 	 *
 	 * @return Paginator The themes.
 	 */
-	public function findAllWithFilter(ThemeFilter $filter): Paginator
+	public function findAllWithFilter(?ThemeFilter $filter): Paginator
 	{
 		$queryBuilder = $this->createQueryBuilder('t');
+
+		if (null === $filter) {
+			$filter = new ThemeFilter();
+		}
 
 		// When we do not have a sort, we want to sort by id descending
 		if (empty($filter->getSort())) {

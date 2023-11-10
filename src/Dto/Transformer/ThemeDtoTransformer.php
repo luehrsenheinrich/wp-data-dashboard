@@ -45,6 +45,19 @@ class ThemeDtoTransformer extends AbstractDtoTransformer
 			'id',
 			'name',
 			'slug',
+			'version',
+			'previewUrl',
+			'screenshotUrl',
+			'homepage',
+			'description',
+			'template',
+			'themeUrl',
+			'lastUpdated',
+			'rating',
+			'numRatings',
+			'activeInstalls',
+			'downloaded',
+			'usageScore',
 		]);
 
 		return $this->getDto();
