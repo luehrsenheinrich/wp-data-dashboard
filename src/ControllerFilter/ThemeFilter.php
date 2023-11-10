@@ -7,6 +7,7 @@ namespace App\ControllerFilter;
 use App\ControllerFilter\Traits\PaginationFilterTrait;
 use App\ControllerFilter\Traits\SortingFilterTrait;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Attributes as OA;
 
 class ThemeFilter extends AbstractFilter
 {
@@ -16,6 +17,7 @@ class ThemeFilter extends AbstractFilter
 	 * @var string
 	 */
 	#[Assert\Length(min:3, max:128)]
+	#[OA\Property(description: 'The theme name.', example: 'Twenty Twenty-Two')]
 	private $name;
 
 	/**

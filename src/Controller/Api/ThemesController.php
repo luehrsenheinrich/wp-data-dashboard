@@ -16,10 +16,11 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use OpenApi\Attributes as OA;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JMS\Serializer\Serializer;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\Response;
 
-#[OA\Tag(name:"Venue")]
+#[OA\Tag(name:"Themes")]
 #[Rest\Route("/themes")]
 class ThemesController extends AbstractLHRestController
 {
