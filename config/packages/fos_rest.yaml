@@ -16,5 +16,6 @@ fos_rest:
     format_listener:
         enabled: true
         rules:
-            - { path: '^/api', prefer_extension: false, fallback_format: json, priorities: [ json, xml ] }
+            - { path: '^/api/auth/helper', stop: true }
+            - { path: '^/api', prefer_extension: false, fallback_format: json, priorities: [ json ] }
             - { path: '^/', stop: true } # Available for version >= 1.5

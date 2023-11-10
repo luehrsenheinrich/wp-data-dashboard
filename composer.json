@@ -13,6 +13,7 @@
         "doctrine/orm": "^2.16",
         "friendsofsymfony/rest-bundle": "^3.6",
         "jms/serializer": "^3.28",
+        "jms/serializer-bundle": "^5.3",
         "knplabs/doctrine-behaviors": "^2.6",
         "nelmio/api-doc-bundle": "^4.12",
         "phpdocumentor/reflection-docblock": "^5.3",

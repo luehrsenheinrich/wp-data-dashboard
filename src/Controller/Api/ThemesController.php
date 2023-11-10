@@ -42,14 +42,11 @@ class ThemesController extends AbstractLHRestController
 	#[OA\Parameter(
 		in: 'query',
 		name: 'query',
-		explode: false,
-		style: 'form',
 		schema: new OA\Schema(
 			ref: new Model(
 				type: ThemeFilter::class,
-				groups: ['read']
-			)
-		)
+			),
+		),
 	)]
 	#[OA\Response(
 		response: 200,
@@ -59,7 +56,6 @@ class ThemesController extends AbstractLHRestController
 			items: new OA\Items(
 				ref: new Model(
 					type: ThemeDto::class,
-					groups: ['read']
 				)
 			)
 		)
