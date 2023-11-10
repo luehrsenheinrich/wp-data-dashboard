@@ -6,6 +6,7 @@ namespace App\ControllerFilter\Traits;
 
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Attributes as OA;
 
 trait PaginationFilterTrait
 {
@@ -14,7 +15,10 @@ trait PaginationFilterTrait
 	 *
 	 * @var integer
 	 */
+	#[Serializer\Type("integer")]
+	#[Serializer\Groups(["read"])]
 	#[Assert\Range(min: 1, max: 100)]
+	#[OA\Property(description: 'How many items to show per page.', example: 10)]
 	private $perPage = 10;
 
 	/**
@@ -23,6 +27,9 @@ trait PaginationFilterTrait
 	 * @var integer
 	 */
 	#[Assert\Range(min: 1)]
+	#[Serializer\Type("integer")]
+	#[Serializer\Groups(["read"])]
+	#[OA\Property(description: 'The current page number.', example: 1)]
 	private $page = 1;
 
 	/**
