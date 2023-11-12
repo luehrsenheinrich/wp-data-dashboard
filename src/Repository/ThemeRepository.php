@@ -107,8 +107,11 @@ class ThemeRepository extends ServiceEntityRepository
 
 		$this->addOrder($queryBuilder, 't', $filter->getOrderBy(), $filter->getOrder(), 't');
 
-		// Add the filter.
-		$this->addFilter($queryBuilder, 'name', $filter->getName(), 't');
+		if (!empty($filter->getSearch())) {
+			$queryBuilder->andWhere('t.name LIKE :search OR t.description LIKE :search')
+				->setParameter('search', '%'.$filter->getSearch().'%');
+		}
+
 
 		return $this->createPaginator($queryBuilder, $filter->getPage(), $filter->getPerPage());
 	}
@@ -131,9 +134,6 @@ class ThemeRepository extends ServiceEntityRepository
 		}
 
 		$this->addOrder($queryBuilder, 't', $filter->getOrderBy(), $filter->getOrder(), 't');
-
-		// Add the filter.
-		$this->addFilter($queryBuilder, 'name', $filter->getName(), 't');
 
 		$queryBuilder->join('t.tags', 'tt')
 			->andWhere('tt.id = :tagId')
