@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\ControllerFilter;
 
+use App\ControllerFilter\Traits\OrderFilterTrait;
 use App\ControllerFilter\Traits\PaginationFilterTrait;
 use App\ControllerFilter\Traits\SortingFilterTrait;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,7 +13,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 class ThemeFilter extends AbstractFilter
 {
-	use PaginationFilterTrait, SortingFilterTrait;
+	use PaginationFilterTrait, OrderFilterTrait;
 
 	/**
 	 * @var ?string
@@ -21,7 +22,7 @@ class ThemeFilter extends AbstractFilter
 	#[OA\Property(description: 'The theme name.', example: 'Twenty Twenty-Two')]
 	#[Serializer\Groups(["read"])]
 	#[Serializer\Type('string')]
-	private $name;
+	private ?string $name = null;
 
 	/**
 	 * Get the value of name
