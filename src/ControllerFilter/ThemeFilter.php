@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\ControllerFilter;
 
+use App\ControllerFilter\Traits\OrderFilterTrait;
 use App\ControllerFilter\Traits\PaginationFilterTrait;
 use App\ControllerFilter\Traits\SortingFilterTrait;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,37 +13,39 @@ use JMS\Serializer\Annotation as Serializer;
 
 class ThemeFilter extends AbstractFilter
 {
-	use PaginationFilterTrait, SortingFilterTrait;
+	use PaginationFilterTrait, OrderFilterTrait;
 
 	/**
+	 * Search for themes.
+	 * This keyword will be used to search for themes in the name and description.
+	 *
 	 * @var ?string
 	 */
 	#[Assert\Length(min:3, max:128)]
-	#[OA\Property(description: 'The theme name.', example: 'Twenty Twenty-Two')]
+	#[OA\Property(description: 'Search for themes.', example: 'Twenty Twenty-Two')]
 	#[Serializer\Groups(["read"])]
 	#[Serializer\Type('string')]
-	private $name;
+	private ?string $search = null;
 
 	/**
-	 * Get the value of name
+	 * Get the search keyword.
 	 *
-	 * @return  ?string
+	 * @return ?string
 	 */
-	public function getName()
+	public function getSearch(): ?string
 	{
-		return $this->name;
+		return $this->search;
 	}
 
 	/**
-	 * Set the value of name
+	 * Set the search keyword.
 	 *
-	 * @param  string  $name
-	 *
-	 * @return  self
+	 * @param ?string $search
+	 * @return self
 	 */
-	public function setName(string $name)
+	public function setSearch(?string $search): self
 	{
-		$this->name = $name;
+		$this->search = $search;
 
 		return $this;
 	}
