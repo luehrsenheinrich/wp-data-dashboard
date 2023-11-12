@@ -69,7 +69,8 @@ class ThemesController extends AbstractController
 		$filter = new ThemeFilter();
 		$filter->setPage($page);
 		$filter->setPerPage(20);
-		$filter->setSort(['-usage_score']);
+		$filter->setOrderBy('downloaded');
+		$filter->setOrder('DESC');
 
 		$themes = $this->themeRepository->findAllWithFilter($filter);
 
@@ -127,7 +128,8 @@ class ThemesController extends AbstractController
 		$filter = new ThemeFilter();
 		$filter->setPage($page);
 		$filter->setPerPage(20);
-		$filter->setSort(['-usage_score']);
+		$filter->setOrderBy('downloaded');
+		$filter->setOrder('DESC');
 
 		$themes = $this->themeRepository->findAllWithFilterByTag($filter, $themeTag);
 
