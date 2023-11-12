@@ -6,6 +6,7 @@ namespace App\ControllerFilter\Traits;
 
 use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait OrderFilterTrait
 {
@@ -21,11 +22,13 @@ trait OrderFilterTrait
 
 	/**
 	 * The direction to order by.
+	 * Can be either ASC or DESC.
 	 *
 	 * @var string
 	 */
 	#[Serializer\Type('string')]
 	#[OA\Property(type: 'string', description: 'The direction to order by.', example: 'ASC')]
+	#[Assert\Choice(choices: ['ASC', 'DESC'])]
 	private string $order = 'ASC';
 
 	/**

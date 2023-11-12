@@ -101,11 +101,11 @@ class ThemeRepository extends ServiceEntityRepository
 		}
 
 		// When we do not have a sort, we want to sort by id descending
-		if (empty($filter->getSort())) {
-			$filter->setSort(['-id']);
+		if (empty($filter->getOrderBy())) {
+			$filter->setOrderBy('id');
 		}
 
-		$this->addSort($queryBuilder, $filter->getSort(), 't');
+		$this->addOrder($queryBuilder, 't', $filter->getOrderBy(), $filter->getOrder(), 't');
 
 		// Add the filter.
 		$this->addFilter($queryBuilder, 'name', $filter->getName(), 't');
@@ -126,11 +126,11 @@ class ThemeRepository extends ServiceEntityRepository
 		$queryBuilder = $this->createQueryBuilder('t');
 
 		// When we do not have a sort, we want to sort by id descending
-		if (empty($filter->getSort())) {
-			$filter->setSort(['-id']);
+		if (empty($filter->getOrderBy())) {
+			$filter->setOrderBy('id');
 		}
 
-		$this->addSort($queryBuilder, $filter->getSort(), 't');
+		$this->addOrder($queryBuilder, 't', $filter->getOrderBy(), $filter->getOrder(), 't');
 
 		// Add the filter.
 		$this->addFilter($queryBuilder, 'name', $filter->getName(), 't');

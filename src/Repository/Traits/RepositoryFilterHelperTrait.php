@@ -15,39 +15,19 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 trait RepositoryFilterHelperTrait
 {
 	/**
-	 * Add the desired sort to the query builder.
-	 * The sort is an array of strings, each string is a field name prefixed with a + or - to indicate the sort direction.
+	 * Add the desired order to the query builder.
 	 *
 	 * @param QueryBuilder $queryBuilder The doctrine query builder.
-	 * @param string[]     $sort The sort array.
 	 * @param string       $alias The doctrine alias of the entity.
-	 *
-	 * @return void
+	 * @param string       $orderBy The field to order by.
+	 * @param string       $order The direction to order by.
 	 */
-	public function addSort(QueryBuilder $queryBuilder, array $sort, string $alias): void
+	public function addOrder(QueryBuilder $queryBuilder, string $alias, string $orderBy, string $order): void
 	{
-		if (count($sort) > 0) {
-			foreach ($sort as $s) {
-				preg_match('/(?<direction>[+-]?)(?<field>\w.*)/', $s, $matches);
+		$field = $this->getFieldFromMap($orderBy);
 
-				if (empty($matches['field'])) {
-					continue;
-				}
-
-				$normalizer = new CamelCaseToSnakeCaseNameConverter();
-				$field = $normalizer->denormalize($matches['field']);
-
-				$field = $this->getFieldFromMap($field);
-
-				$direction = 'ASC';
-				if ($matches['direction'] === '-') {
-					$direction = 'DESC';
-				}
-
-				if ($field) {
-					$queryBuilder->addOrderBy($alias.'.'.$field, $direction);
-				}
-			}
+		if ($field) {
+			$queryBuilder->addOrderBy($alias.'.'.$field, $order);
 		}
 	}
 
