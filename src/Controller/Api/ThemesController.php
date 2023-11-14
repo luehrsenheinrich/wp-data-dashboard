@@ -42,12 +42,54 @@ class ThemesController extends AbstractLHRestController
 	#[REST\View(serializerGroups: ['read'])]
 	#[OA\Parameter(
 		in: 'query',
-		name: 'query',
+		name: 'search',
+		description: 'Search for themes.',
+		example: 'Twenty',
 		schema: new OA\Schema(
-			ref: new Model(
-				type: ThemeFilter::class,
-			),
+			type: 'string',
+			minLength: 3,
+			maxLength: 128,
 		),
+	)]
+	#[OA\Parameter(
+		in: 'query',
+		name: 'page',
+		description: 'The page number.',
+		example: 1,
+		schema: new OA\Schema(
+			type: 'integer',
+			minimum: 1,
+		),
+	)]
+	#[OA\Parameter(
+		in: 'query',
+		name: 'per_page',
+		description: 'The number of items per page.',
+		example: 10,
+		schema: new OA\Schema(
+			type: 'integer',
+			minimum: 1,
+			maximum: 100,
+		),
+	)]
+	#[OA\Parameter(
+		in: 'query',
+		name: 'order',
+		description: 'The order of the items.',
+		example: 'ASC',
+		schema: new OA\Schema(
+			type: 'string',
+			enum: ['ASC', 'DESC'],
+		),
+	)]
+	#[OA\Parameter(
+		in: 'query',
+		name: 'order_by',
+		description: 'The field to order the items by.',
+		example: 'name',
+		schema: new OA\Schema(
+			type: 'string',
+		)
 	)]
 	#[OA\Response(
 		response: 200,
