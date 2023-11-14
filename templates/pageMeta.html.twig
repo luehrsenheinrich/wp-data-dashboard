@@ -6,7 +6,9 @@
 
 <!-- Open Graph -->
 <meta property="og:title" content="{{shortTitle}}">
-<meta property="og:url" content="{{absolute_url(path(app.current_route, app.current_route_parameters))}}">
+{% if app.current_route is not null %}
+	<meta property="og:url" content="{{absolute_url(path(app.current_route, app.current_route_parameters))}}">
+{% endif %}
 <meta property="og:description" content="{{description|u.truncate(156, ' ...')}}">
 <meta property="og:type" content="website">
 
