@@ -17,8 +17,9 @@ trait OrderFilterTrait
 	 * @var string
 	 */
 	#[Serializer\Type('string')]
+	#[Serializer\Groups(["read"])]
 	#[OA\Property(type: 'string', description: 'The field to order by.', example: 'id')]
-	private string $orderBy = 'id';
+	private $orderBy = 'id';
 
 	/**
 	 * The direction to order by.
@@ -27,9 +28,10 @@ trait OrderFilterTrait
 	 * @var string
 	 */
 	#[Serializer\Type('string')]
+	#[Serializer\Groups(["read"])]
 	#[OA\Property(type: 'string', description: 'The direction to order by.', example: 'ASC')]
 	#[Assert\Choice(choices: ['ASC', 'DESC'])]
-	private string $order = 'ASC';
+	private $order = 'ASC';
 
 	/**
 	 * Get the field to order by.
