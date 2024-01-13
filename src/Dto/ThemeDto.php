@@ -42,7 +42,7 @@ class ThemeDto implements DtoInterface
 	#[Serializer\Type('string')]
 	#[Serializer\Groups(["read"])]
 	#[Assert\NotBlank]
-	#[OA\Property(description: 'The theme slug.', example: 'twenty-twenty-two')]
+	#[OA\Property(description: 'The theme slug.', example: 'twentytwentytwo')]
 	public string $slug;
 
 	/**
@@ -174,4 +174,14 @@ class ThemeDto implements DtoInterface
 	#[Serializer\Groups(["read"])]
 	#[OA\Property(description: 'The total theme downloads.', example: 100)]
 	public int $downloaded;
+
+	/**
+	 * The theme tags.
+	 *
+	 * @var ThemeTagDto[]
+	 */
+	#[Serializer\Type('array<App\Dto\ThemeTagDto>')]
+	#[Serializer\Groups(["read"])]
+	#[OA\Property(description: 'The theme tags.', example: [['id' => 1, 'name' => 'Accessibility Ready', 'slug' => 'accessibility-ready']])]
+	public array $tags;
 }

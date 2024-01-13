@@ -6,7 +6,9 @@ namespace App\ControllerFilter\Traits;
 
 use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Validator\Constraints as Assert;
+use function Symfony\Component\String\u;
 
 trait OrderFilterTrait
 {
@@ -40,7 +42,7 @@ trait OrderFilterTrait
 	 */
 	public function getOrderBy(): string
 	{
-		return $this->orderBy;
+		return u($this->orderBy)->camel()->toString();
 	}
 
 	/**

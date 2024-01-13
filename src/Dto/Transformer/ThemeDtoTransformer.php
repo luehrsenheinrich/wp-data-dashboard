@@ -6,9 +6,16 @@ namespace App\Dto\Transformer;
 
 use App\Dto\ThemeDto;
 use App\Entity\Theme;
+use App\Dto\Transformer\ThemeTagDtoTransformer;
 
 class ThemeDtoTransformer extends AbstractDtoTransformer
 {
+
+	public function __construct(
+		private ThemeTagDtoTransformer $themeTagDtoTransformer,
+	) {
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -59,6 +66,17 @@ class ThemeDtoTransformer extends AbstractDtoTransformer
 			'downloaded',
 			'usageScore',
 		]);
+
+		/**
+		 * Set the theme tags.
+		 */
+		if ($entity->getTags()) {
+			$this->setDtoProperty(
+				'tags',
+				$this->themeTagDtoTransformer->transformFromObjects($entity->getTags())
+			);
+		}
+
 
 		return $this->getDto();
 	}
