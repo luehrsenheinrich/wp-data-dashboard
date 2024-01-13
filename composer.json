@@ -21,7 +21,7 @@
         "phpstan/phpdoc-parser": "^1.24",
         "sensio/framework-extra-bundle": "^6.2",
         "symfony/asset": "6.3.*",
-        "symfony/console": "6.3.*",
+        "symfony/console": "6.4.*",
         "symfony/doctrine-messenger": "6.4.*",
         "symfony/dotenv": "6.3.*",
         "symfony/expression-language": "6.4.*",
