@@ -84,15 +84,13 @@ class SchemaQueryParameter
 				continue;
 			}
 
-			$parameterName = $property->property;
-
 			// If the property is an array, we need to add the [] to the name.
 			if ($property->type === 'array') {
-				$parameterName .= '[]';
+				$property->property .= '[]';
 			}
 
 			$parameter = new OA\Parameter([
-				'name' => $parameterName,
+				'name' => $property->property,
 				'in' => 'query',
 				'required' => $property->required,
 				'description' => $property->description,
