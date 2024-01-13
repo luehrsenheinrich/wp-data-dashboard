@@ -31,7 +31,7 @@
         "symfony/http-client": "6.4.*",
         "symfony/intl": "6.3.*",
         "symfony/mailer": "6.3.*",
-        "symfony/messenger": "6.3.*",
+        "symfony/messenger": "6.4.*",
         "symfony/mime": "6.4.*",
         "symfony/monolog-bundle": "^3.8",
         "symfony/notifier": "6.3.*",
