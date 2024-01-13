@@ -105,7 +105,7 @@
         "phpunit/phpunit": "^10.4",
         "symfony/browser-kit": "6.3.*",
         "symfony/css-selector": "6.3.*",
-        "symfony/debug-bundle": "6.3.*",
+        "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^6.3",
         "symfony/stopwatch": "6.3.*",
