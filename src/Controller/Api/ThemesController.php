@@ -16,7 +16,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use OpenApi\Attributes as OA;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\Serializer;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -113,7 +112,7 @@ class ThemesController extends AbstractLHRestController
 		required: true,
 		schema: new OA\Schema(
 			type: 'string',
-			example: 'twenty-twenty-two',
+			example: 'twentytwentytwo',
 		),
 	)]
 	#[OA\Response(

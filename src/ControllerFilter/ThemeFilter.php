@@ -28,6 +28,16 @@ class ThemeFilter extends AbstractFilter
 	private ?string $search = null;
 
 	/**
+	 * Filter by theme tag ids.
+	 *
+	 * @var ?int[]
+	 */
+	#[OA\Property(description: 'Filter by theme tag ids.', example: [1, 2])]
+	#[Serializer\Groups(["read"])]
+	#[Serializer\Type('array<int>')]
+	private $themeTagIds = null;
+
+	/**
 	 * Get the search keyword.
 	 *
 	 * @return ?string
@@ -46,6 +56,29 @@ class ThemeFilter extends AbstractFilter
 	public function setSearch(?string $search): self
 	{
 		$this->search = $search;
+
+		return $this;
+	}
+
+	/**
+	 * Get the theme tag ids.
+	 *
+	 * @return ?int[]
+	 */
+	public function getThemeTagIds(): ?array
+	{
+		return $this->themeTagIds;
+	}
+
+	/**
+	 * Set the theme tag ids.
+	 *
+	 * @param ?int[] $themeTagIds
+	 * @return self
+	 */
+	public function setThemeTagIds(?array $themeTagIds): self
+	{
+		$this->themeTagIds = $themeTagIds;
 
 		return $this;
 	}
