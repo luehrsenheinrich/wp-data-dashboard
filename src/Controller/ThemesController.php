@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\ControllerFilter\ThemeFilter;
+use App\Entity\Theme;
 use App\Repository\ThemeRepository;
 use App\Repository\ThemeStatSnapshotRepository;
 use App\Repository\ThemeTagRepository;
@@ -12,6 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use Omines\DataTablesBundle\Adapter\ArrayAdapter;
+use Omines\DataTablesBundle\Column\TextColumn;
+use Omines\DataTablesBundle\DataTableFactory;
+use Symfony\Component\HttpFoundation\Request;
+use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
+
 class ThemesController extends AbstractController
 {
 	public function __construct(
@@ -20,6 +27,7 @@ class ThemesController extends AbstractController
 		private ThemeTagRepository $themeTagRepository,
 		private NavigationService $navigationService,
 		private PageMetaService $pageMetaService,
+		private DataTableFactory $dataTableFactory,
 	) {
 	}
 
@@ -64,7 +72,7 @@ class ThemesController extends AbstractController
 	}
 
 	#[Route('/themes/list/{page}', name: 'app_themes_list', requirements: ['page' => '\d+'])]
-	public function list($page = 1): Response
+	public function list(Request $request, $page = 1): Response
 	{
 		$filter = new ThemeFilter();
 		$filter->setPage($page);
@@ -88,10 +96,22 @@ class ThemesController extends AbstractController
 
 		$themeStats = $this->themeRepository->getCurrentStats();
 
+		$table = $this->dataTableFactory->create()
+			->add('name', TextColumn::class)
+			->createAdapter(ORMAdapter::class, [
+				'entity' => Theme::class,
+			])
+			->handleRequest($request);
+
+		if ($table->isCallback()) {
+			return $table->getResponse();
+		}
+
 		return $this->render('themes/list.html.twig', [
 			'themes' => $themes,
 			'pagination' => $pagination,
 			'stats' => $themeStats,
+			'datatable' => $table,
 		]);
 	}
 
