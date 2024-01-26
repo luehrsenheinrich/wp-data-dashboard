@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d7bb7b733fb55b8d72d307e278029be",
+    "content-hash": "1081e6e856ec9e36ce6694065dbf05a9",
     "packages": [
         {
             "name": "brick/math",
@@ -2371,6 +2371,119 @@
                 "source": "https://github.com/nette/utils/tree/v3.2.10"
             },
             "time": "2023-07-30T15:38:18+00:00"
+        },
+        {
+            "name": "omines/datatables-bundle",
+            "version": "0.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/omines/datatables-bundle.git",
+                "reference": "d0503e8bd56f5c4b379e930f51f499d0a04d07c1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/omines/datatables-bundle/zipball/d0503e8bd56f5c4b379e930f51f499d0a04d07c1",
+                "reference": "d0503e8bd56f5c4b379e930f51f499d0a04d07c1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/event-dispatcher": "^6.3|^7.0",
+                "symfony/framework-bundle": "^6.3|^7.0",
+                "symfony/options-resolver": "^6.3|^7.0",
+                "symfony/property-access": "^6.3|^7.0",
+                "symfony/translation": "^6.3|^7.0"
+            },
+            "require-dev": {
+                "doctrine/common": "^2.6|^3.3",
+                "doctrine/doctrine-bundle": "^2.11.1",
+                "doctrine/orm": "^2.13.1",
+                "doctrine/persistence": "^3.0.3",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mongodb": "*",
+                "ext-pdo_sqlite": "*",
+                "ext-zip": "*",
+                "friendsofphp/php-cs-fixer": "^v3.40.0",
+                "mongodb/mongodb": "^1.12",
+                "ocramius/package-versions": "^2.8",
+                "phpoffice/phpspreadsheet": "^1.24.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8.2",
+                "phpstan/phpstan-doctrine": "^1.3.12",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpstan/phpstan-symfony": "^1.2.9",
+                "phpunit/phpunit": "^10.5.1",
+                "ruflin/elastica": "^6.0|^7.2",
+                "symfony/browser-kit": "^6.1.3|^7.0",
+                "symfony/css-selector": "^6.1.3|^7.0",
+                "symfony/doctrine-bridge": "^6.3|^7.0",
+                "symfony/dom-crawler": "^6.1.3|^7.0",
+                "symfony/intl": "^6.1|^7.0",
+                "symfony/mime": "^6.1.3|^7.0",
+                "symfony/phpunit-bridge": "^6.3|^7.0",
+                "symfony/twig-bundle": "^6.1.1|^7.0",
+                "symfony/var-dumper": "^6.1.3|^7.0",
+                "symfony/yaml": "^6.1.3|^7.0"
+            },
+            "suggest": {
+                "doctrine/doctrine-bundle": "For integrated access to Doctrine object managers",
+                "doctrine/orm": "For full automated integration with Doctrine entities",
+                "mongodb/mongodb": "For integration with MongoDB collections",
+                "phpoffice/phpspreadsheet": "To export the data from DataTables to Excel",
+                "ruflin/elastica": "For integration with Elasticsearch indexes",
+                "symfony/twig-bundle": "To use default Twig based rendering and TwigColumn"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Omines\\DataTablesBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Robbert Beesems",
+                    "email": "robbert.beesems@omines.com",
+                    "homepage": "https://www.omines.nl/"
+                },
+                {
+                    "name": "Niels Keurentjes",
+                    "email": "niels.keurentjes@omines.com",
+                    "homepage": "https://www.omines.nl/"
+                }
+            ],
+            "description": "Symfony DataTables Bundle with native Doctrine ORM, Elastica and MongoDB support",
+            "keywords": [
+                "bundle",
+                "datatable",
+                "datatables",
+                "doctrine",
+                "elastica",
+                "jquery",
+                "mongodb",
+                "orm",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/omines/datatables-bundle/issues",
+                "source": "https://github.com/omines/datatables-bundle/tree/0.8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/curry684",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-12-05T08:18:04+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -10916,5 +11029,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
