@@ -14,11 +14,29 @@ class ThemeTag implements TimestampableInterface
 {
 	use IdTrait, SetFromArrayTrait, TimestampableTrait;
 
+	/**
+	 * The slug of the theme tag.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255, unique: true)]
 	private ?string $slug = null;
 
+	/**
+	 * The name of the theme tag.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255)]
 	private ?string $name = null;
+
+	/**
+	 * The number of themes that are tagged with this theme tag.
+	 * This property is not persisted.
+	 *
+	 * @var int|null
+	 */
+	private ?int $themeCount = null;
 
 	public function getSlug(): ?string
 	{
@@ -40,6 +58,18 @@ class ThemeTag implements TimestampableInterface
 	public function setName(string $name): static
 	{
 		$this->name = $name;
+
+		return $this;
+	}
+
+	public function getThemeCount(): ?int
+	{
+		return $this->themeCount;
+	}
+
+	public function setThemeCount(int $themeCount): static
+	{
+		$this->themeCount = $themeCount;
 
 		return $this;
 	}
