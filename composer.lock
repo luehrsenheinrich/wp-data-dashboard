@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43d02880264949f82e7eaae1398f6c73",
+    "content-hash": "8e0d8345e182f8f2c2dd77dd59d3e99b",
     "packages": [
         {
             "name": "brick/math",
@@ -3720,16 +3720,16 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.4.0",
+            "version": "v3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "7c3aff79d10325257a001fcf92d991f24fc967cf"
+                "reference": "0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/7c3aff79d10325257a001fcf92d991f24fc967cf",
-                "reference": "7c3aff79d10325257a001fcf92d991f24fc967cf",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1",
+                "reference": "0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1",
                 "shasum": ""
             },
             "require": {
@@ -3738,7 +3738,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "3.4-dev"
+                    "dev-main": "3.5-dev"
                 },
                 "thanks": {
                     "name": "symfony/contracts",
@@ -3767,7 +3767,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.4.0"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.5.0"
             },
             "funding": [
                 {
@@ -3783,7 +3783,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-23T14:45:45+00:00"
+            "time": "2024-04-18T09:32:20+00:00"
         },
         {
             "name": "symfony/doctrine-bridge",
@@ -7075,16 +7075,16 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v6.3.8",
+            "version": "v6.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "b3ad1515a276473f7919ac97e560017284a7c4bf"
+                "reference": "73820ab43d12c2f29445080004054b0066082bf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/b3ad1515a276473f7919ac97e560017284a7c4bf",
-                "reference": "b3ad1515a276473f7919ac97e560017284a7c4bf",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/73820ab43d12c2f29445080004054b0066082bf1",
+                "reference": "73820ab43d12c2f29445080004054b0066082bf1",
                 "shasum": ""
             },
             "require": {
@@ -7100,28 +7100,32 @@
                 "symfony/property-access": "<5.4",
                 "symfony/property-info": "<5.4.24|>=6,<6.2.11",
                 "symfony/uid": "<5.4",
+                "symfony/validator": "<6.4",
                 "symfony/yaml": "<5.4"
             },
             "require-dev": {
                 "doctrine/annotations": "^1.12|^2",
                 "phpdocumentor/reflection-docblock": "^3.2|^4.0|^5.0",
-                "symfony/cache": "^5.4|^6.0",
-                "symfony/config": "^5.4|^6.0",
-                "symfony/console": "^5.4|^6.0",
-                "symfony/dependency-injection": "^5.4|^6.0",
-                "symfony/error-handler": "^5.4|^6.0",
-                "symfony/filesystem": "^5.4|^6.0",
-                "symfony/form": "^5.4|^6.0",
-                "symfony/http-foundation": "^5.4|^6.0",
-                "symfony/http-kernel": "^5.4|^6.0",
-                "symfony/mime": "^5.4|^6.0",
-                "symfony/property-access": "^5.4|^6.0",
-                "symfony/property-info": "^5.4.24|^6.2.11",
-                "symfony/uid": "^5.4|^6.0",
-                "symfony/validator": "^5.4|^6.0",
-                "symfony/var-dumper": "^5.4|^6.0",
-                "symfony/var-exporter": "^5.4|^6.0",
-                "symfony/yaml": "^5.4|^6.0"
+                "seld/jsonlint": "^1.10",
+                "symfony/cache": "^5.4|^6.0|^7.0",
+                "symfony/config": "^5.4|^6.0|^7.0",
+                "symfony/console": "^5.4|^6.0|^7.0",
+                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+                "symfony/error-handler": "^5.4|^6.0|^7.0",
+                "symfony/filesystem": "^5.4|^6.0|^7.0",
+                "symfony/form": "^5.4|^6.0|^7.0",
+                "symfony/http-foundation": "^5.4|^6.0|^7.0",
+                "symfony/http-kernel": "^5.4|^6.0|^7.0",
+                "symfony/messenger": "^5.4|^6.0|^7.0",
+                "symfony/mime": "^5.4|^6.0|^7.0",
+                "symfony/property-access": "^5.4.26|^6.3|^7.0",
+                "symfony/property-info": "^5.4.24|^6.2.11|^7.0",
+                "symfony/translation-contracts": "^2.5|^3",
+                "symfony/uid": "^5.4|^6.0|^7.0",
+                "symfony/validator": "^6.4|^7.0",
+                "symfony/var-dumper": "^5.4|^6.0|^7.0",
+                "symfony/var-exporter": "^5.4|^6.0|^7.0",
+                "symfony/yaml": "^5.4|^6.0|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -7149,7 +7153,7 @@
             "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/serializer/tree/v6.3.8"
+                "source": "https://github.com/symfony/serializer/tree/v6.4.7"
             },
             "funding": [
                 {
@@ -7165,7 +7169,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-11-07T10:11:25+00:00"
+            "time": "2024-04-23T09:00:49+00:00"
         },
         {
             "name": "symfony/service-contracts",
