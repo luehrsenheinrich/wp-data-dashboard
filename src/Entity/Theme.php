@@ -15,67 +15,165 @@ use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Service\Attribute\Required;
 
+/**
+ * Represents a WordPress theme.
+ */
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
 class Theme implements TimestampableInterface
 {
 	use IdTrait, TimestampableTrait, SetFromArrayTrait;
 
+	/**
+	 * The theme's slug.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(nullable: false, unique: true)]
 	#[Assert\NotBlank]
 	private ?string $slug = null;
 
+	/**
+	 * The theme's name.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255)]
 	private ?string $name = null;
 
+	/**
+	 * The theme's version.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255)]
 	private ?string $version = null;
 
+	/**
+	 * The URL to the theme's preview.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $previewUrl = null;
 
+	/**
+	 * The URL to the theme's screenshot.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255)]
 	private ?string $screenshotUrl = null;
 
+	/**
+	 * The URL to the theme's homepage.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255)]
 	private ?string $homepage = null;
 
+	/**
+	 * The theme's description.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(type: Types::TEXT)]
 	private ?string $description = null;
 
+	/**
+	 * The theme's parent theme (or 'template').
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $template = null;
 
+	/**
+	 * The URL to the theme's marketing page.
+	 *
+	 * @var string|null
+	 */
 	#[ORM\Column(length: 255, nullable: true)]
 	private ?string $themeUrl = null;
 
+	/**
+	 * The date and time the theme was last updated.
+	 *
+	 * @var \DateTimeImmutable|null
+	 */
 	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
 	private ?\DateTimeImmutable $lastUpdated = null;
 
+	/**
+	 * The theme's tags.
+	 *
+	 * @var Collection<int, ThemeTag>
+	 */
 	#[ORM\ManyToMany(targetEntity: ThemeTag::class)]
 	private Collection $tags;
 
+	/**
+	 * The theme's author.
+	 *
+	 * @var ThemeAuthor|null
+	 */
 	#[ORM\ManyToOne(inversedBy: 'theme', cascade: ['persist'], fetch: 'EAGER')]
 	#[ORM\JoinColumn(nullable: false)]
 	private ?ThemeAuthor $author = null;
 
+	/**
+	 * The stats snapshots for this theme.
+	 *
+	 * @var Collection<ThemeStatSnapshot>
+	 */
 	#[ORM\OneToMany(mappedBy: 'theme', targetEntity: ThemeStatSnapshot::class)]
 	private Collection $themeStatSnapthots;
 
+	/**
+	 * The theme's rating.
+	 *
+	 * @var integer|null
+	 */
 	#[ORM\Column]
 	private ?int $rating = null;
 
+	/**
+	 * The number of ratings the theme has received.
+	 *
+	 * @var integer|null
+	 */
 	#[ORM\Column]
 	private ?int $numRatings = null;
 
+	/**
+	 * The number of active installs the theme has.
+	 *
+	 * @var integer|null
+	 */
 	#[ORM\Column]
 	private ?int $activeInstalls = null;
 
+	/**
+	 * The number of times the theme has been downloaded.
+	 *
+	 * @var integer|null
+	 */
 	#[ORM\Column]
 	private ?int $downloaded = null;
 
+	/**
+	 * The theme's usage score.
+	 *
+	 * @var float|null
+	 */
 	#[ORM\Column]
 	private ?float $usageScore = null;
 
+	/**
+	 * The theme's parent theme.
+	 *
+	 * @var Theme|null
+	 */
 	#[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
 	private ?self $parent = null;
 
