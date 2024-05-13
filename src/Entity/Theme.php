@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Entity\EntityTraits\IdTrait;
 use App\Entity\EntityTraits\SetFromArrayTrait;
 use App\Repository\ThemeRepository;
-use App\Repository\ThemeStatSnapshotRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,10 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Represents a WordPress theme.
+ *
+ * @see https://codex.wordpress.org/WordPress.org_API#Themes
  */
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
 class Theme implements TimestampableInterface
