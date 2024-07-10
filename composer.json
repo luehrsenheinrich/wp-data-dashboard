@@ -22,7 +22,7 @@
         "sensio/framework-extra-bundle": "^6.2",
         "symfony/asset": "6.4.*",
         "symfony/console": "6.4.*",
-        "symfony/doctrine-messenger": "6.4.*",
+        "symfony/doctrine-messenger": "7.1.*",
         "symfony/dotenv": "6.4.*",
         "symfony/expression-language": "6.4.*",
         "symfony/flex": "^2",
