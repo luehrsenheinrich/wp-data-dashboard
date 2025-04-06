@@ -177,6 +177,34 @@ class Theme implements TimestampableInterface
 	#[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
 	private ?self $parent = null;
 
+	// ==========
+	// Downloads per day
+	// ==========
+
+	/**
+	 * The average number of downloads per day for the last 28 days.
+	 *
+	 * @var int|null
+	 */
+	#[ORM\Column]
+	private ?int $dpdAvg28 = null; // phpcs:ignore Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers
+
+	/**
+	 * The average number of downloads per day for the last 7 days.
+	 *
+	 * @var int|null
+	 */
+	#[ORM\Column]
+	private ?int $dpdAvg7 = null; // phpcs:ignore Zend.NamingConventions.ValidVariableName.MemberVarContainsNumbers
+
+	/**
+	 * The datetime of the last download count update.
+	 *
+	 * @var \DateTimeImmutable|null
+	 */
+	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+	private ?\DateTimeImmutable $dpdLastUpdated = null;
+
 	public function __construct()
 	{
 		$this->tags = new ArrayCollection();
