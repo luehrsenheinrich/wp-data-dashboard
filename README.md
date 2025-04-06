@@ -16,6 +16,14 @@ Consequently, along with a strategic shift in our priorities, we have decided to
 
 We thank all our users and sincerely hope the project has provided valuable insights. In line with the open and collaborative spirit of the WordPress community, the source code will remain publicly accessible as a learning resource for others.
 
+---
+
+## Additional Resources 🔖
+
+For further reading about this project and its impact, you can check out this article from WP Tavern: ["WP Data Dashboard Tracks WordPress.org Themes Ecosystem"](https://wptavern.com/wp-data-dashboard-tracks-wordpress-org-themes-ecosystem), which provides additional context and insights about our project.
+
+---
+
 ## Modules 🛠️
 
 The project gathers data for different modules, with each module responsible for providing data for a specific part of the WordPress ecosystem.
@@ -29,4 +37,3 @@ The Theme Repository module gathers data from the WordPress theme repository. It
 *Usage Score* represents the effectiveness of a theme based on its active installs and total downloads. A high score indicates a theme that not only has been downloaded frequently but also remains actively installed on many sites. The score undergoes a significant decay if the proportion of active installs to downloads is low, indicating that while the theme might be frequently downloaded, it's not retained by users. This metric provides insight into both the initial appeal of a theme and its lasting utility to users.
 
 *Diversity Score* quantifies the distribution of theme downloads among different authors on a scale from 0% to 100%. A high score indicates that downloads are spread across many authors, suggesting a diverse and competitive marketplace. On the other hand, a low score suggests that a few authors dominate the downloads, indicating less diversity. This metric provides insight into the variety of theme offerings and the balance of power in the theme marketplace.
-
