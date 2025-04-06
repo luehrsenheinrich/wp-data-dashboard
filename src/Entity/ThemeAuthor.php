@@ -9,6 +9,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\EntityTraits\SetFromArrayTrait;
 
+/**
+ * The author of a WordPress theme.
+ */
 #[ORM\Entity(repositoryClass: ThemeAuthorRepository::class)]
 class ThemeAuthor
 {
@@ -25,12 +28,6 @@ class ThemeAuthor
 
 	#[ORM\Column(length: 255)]
 	private ?string $displayName = null;
-
-	#[ORM\Column(length: 255, nullable: true)]
-	private ?string $author = null;
-
-	#[ORM\Column(length: 255, nullable: true)]
-	private ?string $authorUrl = null;
 
 	#[ORM\OneToMany(mappedBy: 'author', targetEntity: Theme::class, orphanRemoval: true)]
 	private Collection $theme;
@@ -84,30 +81,6 @@ class ThemeAuthor
 	public function setDisplayName(string $displayName): static
 	{
 		$this->displayName = $displayName;
-
-		return $this;
-	}
-
-	public function getAuthor(): ?string
-	{
-		return $this->author;
-	}
-
-	public function setAuthor(?string $author): static
-	{
-		$this->author = $author;
-
-		return $this;
-	}
-
-	public function getAuthorUrl(): ?string
-	{
-		return $this->authorUrl;
-	}
-
-	public function setAuthorUrl(?string $authorUrl): static
-	{
-		$this->authorUrl = $authorUrl;
 
 		return $this;
 	}
