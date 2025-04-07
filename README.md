@@ -22,6 +22,11 @@ We thank all our users and sincerely hope the project has provided valuable insi
 
 For further reading about this project and its impact, you can check out this article from WP Tavern: ["WP Data Dashboard Tracks WordPress.org Themes Ecosystem"](https://wptavern.com/wp-data-dashboard-tracks-wordpress-org-themes-ecosystem), which provides additional context and insights about our project.
 
+### Screenshots 📸
+
+| ![Screenshot 1](./.github/screenshot-1.png) | ![Screenshot 2](./.github/screenshot-2.png) | ![Screenshot 3](./.github/screenshot-3.png) |
+|------------------------------------------|------------------------------------------|------------------------------------------|
+
 ---
 
 ## Modules 🛠️
